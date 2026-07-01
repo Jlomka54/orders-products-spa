@@ -6,6 +6,25 @@ const getDuplicateField = (error) => {
   return Object.keys(error.keyPattern ?? error.keyValue ?? {})[0];
 };
 
+const toPublicUser = (user) => {
+  const publicUser = user.toObject();
+  delete publicUser.password;
+
+  return publicUser;
+};
+
+const ensureJwtSecret = (res) => {
+  if (process.env.JWT_SECRET) {
+    return true;
+  }
+
+  res.status(500).json({
+    message: "Auth service is not configured",
+  });
+
+  return false;
+};
+
 export const register = async (req, res) => {
   try {
     console.log("Register request received:", req.body);
@@ -17,6 +36,10 @@ export const register = async (req, res) => {
       return res.status(400).json({
         message: "Username and password are required",
       });
+    }
+
+    if (!ensureJwtSecret(res)) {
+      return;
     }
 
     const isUsed = await User.findOne({ username });
@@ -44,7 +67,7 @@ export const register = async (req, res) => {
     );
 
     return res.status(201).json({
-      user: newUser,
+      user: toPublicUser(newUser),
       token,
       message: "Registration was successful",
     });
@@ -84,6 +107,10 @@ export const login = async (req, res) => {
       });
     }
 
+    if (!ensureJwtSecret(res)) {
+      return;
+    }
+
     const user = await User.findOne({ username });
 
     if (!user) {
@@ -107,7 +134,11 @@ export const login = async (req, res) => {
     );
     return res
       .status(201)
-      .json({ user, token, message: "You have successfully logged in" });
+      .json({
+        user: toPublicUser(user),
+        token,
+        message: "You have successfully logged in",
+      });
   } catch (error) {
     return res.status(500).json({
       message: "Login failed",
@@ -117,6 +148,10 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
+    if (!ensureJwtSecret(res)) {
+      return;
+    }
+
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(400).json({
@@ -131,7 +166,7 @@ export const getMe = async (req, res) => {
       { expiresIn: "30d" },
     );
     return res.json({
-      user,
+      user: toPublicUser(user),
       token,
     });
   } catch (error) {
