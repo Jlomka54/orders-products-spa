@@ -1,4 +1,5 @@
 import { useState } from "react";
+import StatusBadge from "../../../components/ui/StatusBadge";
 import { formatLongDate, formatShortDate } from "../../../utils/formatDate";
 import { formatPrice } from "../../../utils/formatPrice";
 
@@ -30,7 +31,6 @@ const ProductItem = ({ product }) => {
   const [hasImageError, setHasImageError] = useState(false);
   const usdPrice = findPrice(product.price, "USD");
   const uahPrice = findPrice(product.price, "UAH");
-  const statusText = product.isNew ? "New" : "Used";
   const shouldShowImage = product.photo && !hasImageError;
 
   return (
@@ -39,8 +39,7 @@ const ProductItem = ({ product }) => {
         className={`products-page__status-dot${
           product.isNew ? " products-page__status-dot--new" : ""
         }`}
-        aria-label={statusText}
-        title={statusText}
+        aria-hidden="true"
       />
 
       <div className="products-page__photo">
@@ -61,6 +60,7 @@ const ProductItem = ({ product }) => {
         <span className="products-page__serial-number">
           SN: {product.serialNumber}
         </span>
+        <StatusBadge isNew={product.isNew} />
       </div>
 
       <span className="products-page__type">{product.type}</span>

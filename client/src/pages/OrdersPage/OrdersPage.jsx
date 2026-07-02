@@ -19,6 +19,9 @@ import {
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
 import OrderDetailsPanel from "../../features/orders/components/OrderDetailsPanel";
 import OrdersList from "../../features/orders/components/OrdersList";
+import EmptyState from "../../components/ui/EmptyState";
+import ErrorMessage from "../../components/ui/ErrorMessage";
+import Loader from "../../components/ui/Loader";
 import "./OrdersPage.css";
 
 const getOrderId = (order) => order.id ?? order._id;
@@ -71,25 +74,25 @@ const OrdersPage = () => {
   };
 
   if (isLoading && orders.length === 0) {
-    return <div className="orders-page__state">Loading orders...</div>;
+    return <Loader text="Loading orders..." />;
   }
 
   if (error && orders.length === 0) {
-    return <div className="orders-page__state">Failed to load orders: {error}</div>;
+    return <ErrorMessage message={`Failed to load orders: ${error}`} />;
   }
 
   if (orders.length === 0) {
-    return <div className="orders-page__state">No orders found.</div>;
+    return <EmptyState message="No orders found." />;
   }
 
   return (
     <section className="orders-page">
       {error && (
-        <div className="orders-page__state">Failed to load orders: {error}</div>
+        <ErrorMessage message={`Failed to load orders: ${error}`} />
       )}
 
       {isLoading && (
-        <div className="orders-page__state">Loading orders...</div>
+        <Loader text="Loading orders..." />
       )}
 
       <div className="orders-page__content">

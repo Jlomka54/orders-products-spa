@@ -15,6 +15,9 @@ import {
   setSelectedSpecification,
   setSelectedType,
 } from "../../features/products/productsSlice";
+import EmptyState from "../../components/ui/EmptyState";
+import ErrorMessage from "../../components/ui/ErrorMessage";
+import Loader from "../../components/ui/Loader";
 import ProductsFilters from "../../features/products/components/ProductsFilters";
 import ProductsList from "../../features/products/components/ProductsList";
 import "./ProductsPage.css";
@@ -43,31 +46,25 @@ export const ProductsPage = () => {
   };
 
   if (isLoading && products.length === 0) {
-    return <div className="products-page__state">Loading products...</div>;
+    return <Loader text="Loading products..." />;
   }
 
   if (error && products.length === 0) {
-    return (
-      <div className="products-page__state">
-        Failed to load products: {error}
-      </div>
-    );
+    return <ErrorMessage message={`Failed to load products: ${error}`} />;
   }
 
   if (products.length === 0) {
-    return <div className="products-page__state">No products found.</div>;
+    return <EmptyState message="No products found." />;
   }
 
   return (
     <section className="products-page">
       {error && (
-        <div className="products-page__state">
-          Failed to load products: {error}
-        </div>
+        <ErrorMessage message={`Failed to load products: ${error}`} />
       )}
 
       {isLoading && (
-        <div className="products-page__state">Loading products...</div>
+        <Loader text="Loading products..." />
       )}
 
       <ProductsFilters
@@ -80,7 +77,7 @@ export const ProductsPage = () => {
       />
 
       {filteredProducts.length === 0 ? (
-        <div className="products-page__state">No products match filters.</div>
+        <EmptyState message="No products match filters." />
       ) : (
         <ProductsList products={filteredProducts} />
       )}
