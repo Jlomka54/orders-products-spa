@@ -1,44 +1,27 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  selectDeleteModalOrderId,
   selectOrders,
   selectOrdersError,
   selectOrdersLoading,
   selectSelectedOrderId,
+  selectSelectedOrderDetails,
 } from "../../features/orders/ordersSelectors";
 import {
+  closeDeleteModal,
   fetchOrderById,
   fetchOrders,
+  openDeleteModal,
+  removeOrder,
   setSelectedOrderId,
 } from "../../features/orders/ordersSlice";
-import { calculateOrderTotal } from "../../utils/calculateOrderTotal";
-import { formatShortDate, formatLongDate } from "../../utils/formatDate";
-import { formatPrice } from "../../utils/formatPrice";
+import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
+import OrderDetailsPanel from "../../features/orders/components/OrderDetailsPanel";
+import OrdersList from "../../features/orders/components/OrdersList";
 import "./OrdersPage.css";
 
-const getOrderId = (order) => order.id || order._id;
-
-const getOrderProducts = (order) => {
-  if (Array.isArray(order.products)) {
-    return order.products;
-  }
-
-  if (Array.isArray(order.items)) {
-    return order.items;
-  }
-
-  return [];
-};
-
-const getProductsCount = (order) => {
-  if (Number.isFinite(Number(order.productsCount))) {
-    return Number(order.productsCount);
-  }
-
-  return getOrderProducts(order).length;
-};
-
-const getOrderDate = (order) => order.date || order.createdAt;
+const getOrderId = (order) => order.id ?? order._id;
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
@@ -46,6 +29,21 @@ const OrdersPage = () => {
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
   const selectedOrderId = useSelector(selectSelectedOrderId);
+  const selectedOrderDetails = useSelector(selectSelectedOrderDetails);
+  const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
+
+  const deleteModalOrder =
+    orders.find((order) => String(getOrderId(order)) === String(deleteModalOrderId)) ||
+    null;
+  const selectedDetailsId =
+    selectedOrderDetails === null ? null : getOrderId(selectedOrderDetails);
+  const activeSelectedOrderDetails =
+    selectedOrderDetails &&
+    (selectedDetailsId === null ||
+      selectedDetailsId === undefined ||
+      String(selectedDetailsId) === String(selectedOrderId))
+      ? selectedOrderDetails
+      : null;
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -54,6 +52,22 @@ const OrdersPage = () => {
   const handleOrderClick = (orderId) => {
     dispatch(setSelectedOrderId(orderId));
     dispatch(fetchOrderById(orderId));
+  };
+
+  const handleOpenDeleteModal = (orderId) => {
+    dispatch(openDeleteModal(orderId));
+  };
+
+  const handleCloseDeleteModal = () => {
+    dispatch(closeDeleteModal());
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModalOrderId === null || deleteModalOrderId === undefined) {
+      return;
+    }
+
+    dispatch(removeOrder(deleteModalOrderId));
   };
 
   if (isLoading && orders.length === 0) {
@@ -78,43 +92,24 @@ const OrdersPage = () => {
         <div className="orders-page__state">Loading orders...</div>
       )}
 
-      <ul className="orders-page__list">
-        {orders.map((order) => {
-          const orderId = getOrderId(order);
-          const products = getOrderProducts(order);
-          const orderDate = getOrderDate(order);
-          const isSelected = String(orderId) === String(selectedOrderId);
+      <div className="orders-page__content">
+        <OrdersList
+          orders={orders}
+          selectedOrderId={selectedOrderId}
+          onOrderSelect={handleOrderClick}
+          onDeleteOrder={handleOpenDeleteModal}
+        />
 
-          return (
-            <li className="orders-page__item" key={orderId}>
-              <button
-                className={`orders-page__order${
-                  isSelected ? " orders-page__order--selected" : ""
-                }`}
-                type="button"
-                onClick={() => handleOrderClick(orderId)}
-              >
-                <span className="orders-page__title">{order.title}</span>
-                <span className="orders-page__products-count">
-                  {getProductsCount(order)}
-                </span>
-                <span className="orders-page__short-date">
-                  {formatShortDate(orderDate)}
-                </span>
-                <span className="orders-page__long-date">
-                  {formatLongDate(orderDate)}
-                </span>
-                <span className="orders-page__total-usd">
-                  {formatPrice(calculateOrderTotal(products, "USD"), "USD")}
-                </span>
-                <span className="orders-page__total-uah">
-                  {formatPrice(calculateOrderTotal(products, "UAH"), "UAH")}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+        <OrderDetailsPanel selectedOrderDetails={activeSelectedOrderDetails} />
+      </div>
+
+      <DeleteOrderModal
+        deleteModalOrderId={deleteModalOrderId}
+        order={deleteModalOrder}
+        isLoading={isLoading}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+      />
     </section>
   );
 };
