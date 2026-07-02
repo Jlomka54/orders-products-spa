@@ -1,4 +1,24 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getProductsApi } from "../../api/productsApi";
+
+export const fetchProducts = createAsyncThunk(
+  "products/fetchProducts",
+  async (params, { getState, rejectWithValue }) => {
+    try {
+      const { selectedType, selectedSpecification } = getState().products;
+      const requestParams = {
+        type: selectedType === "all" ? undefined : selectedType,
+        specification:
+          selectedSpecification === "all" ? undefined : selectedSpecification,
+        ...params,
+      };
+
+      return await getProductsApi(requestParams);
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
 
 const initialState = {
   items: [],
@@ -6,6 +26,16 @@ const initialState = {
   selectedSpecification: "all",
   isLoading: false,
   error: null,
+};
+
+const setPendingState = (state) => {
+  state.isLoading = true;
+  state.error = null;
+};
+
+const setRejectedState = (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload || action.error.message || "Products request failed";
 };
 
 const productsSlice = createSlice({
@@ -22,6 +52,16 @@ const productsSlice = createSlice({
       state.selectedType = "all";
       state.selectedSpecification = "all";
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchProducts.pending, setPendingState)
+      .addCase(fetchProducts.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(fetchProducts.rejected, setRejectedState);
   },
 });
 
