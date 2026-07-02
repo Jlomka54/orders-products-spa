@@ -15,5 +15,5 @@ export const selectDeleteModalOrderId = (state) =>
 export const selectSelectedOrder = (state) =>
   state.orders.items.find(
     (order) =>
-      String(order.id || order._id) === String(state.orders.selectedOrderId),
+      String(order.id ?? order._id) === String(state.orders.selectedOrderId),
   ) || null;

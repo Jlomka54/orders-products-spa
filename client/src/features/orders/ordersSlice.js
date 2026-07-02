@@ -62,7 +62,7 @@ const setRejectedState = (state, action) => {
   state.error = action.payload || action.error.message || "Orders request failed";
 };
 
-const getOrderId = (order) => String(order.id || order._id);
+const getOrderId = (order) => String(order.id ?? order._id);
 
 const ordersSlice = createSlice({
   name: "orders",
@@ -86,7 +86,7 @@ const ordersSlice = createSlice({
     builder
       .addCase(fetchOrders.pending, setPendingState)
       .addCase(fetchOrders.fulfilled, (state, action) => {
-        state.items = action.payload;
+        state.items = Array.isArray(action.payload) ? action.payload : [];
         state.isLoading = false;
         state.error = null;
       })

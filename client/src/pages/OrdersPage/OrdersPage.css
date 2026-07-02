@@ -192,7 +192,7 @@
 
 .orders-page__details-product {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
   padding: 12px 38px;

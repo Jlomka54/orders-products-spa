@@ -57,7 +57,7 @@ const productsSlice = createSlice({
     builder
       .addCase(fetchProducts.pending, setPendingState)
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.items = action.payload;
+        state.items = Array.isArray(action.payload) ? action.payload : [];
         state.isLoading = false;
         state.error = null;
       })
