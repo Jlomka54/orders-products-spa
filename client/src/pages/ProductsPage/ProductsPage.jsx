@@ -15,33 +15,9 @@ import {
   setSelectedSpecification,
   setSelectedType,
 } from "../../features/products/productsSlice";
-import { formatLongDate, formatShortDate } from "../../utils/formatDate";
-import { formatPrice } from "../../utils/formatPrice";
+import ProductsFilters from "../../features/products/components/ProductsFilters";
+import ProductsList from "../../features/products/components/ProductsList";
 import "./ProductsPage.css";
-
-const findPrice = (prices, symbol) => {
-  if (!Array.isArray(prices)) {
-    return null;
-  }
-
-  return prices.find((price) => price?.symbol === symbol) || null;
-};
-
-const getOrderTitle = (product) => {
-  if (product.orderTitle) {
-    return product.orderTitle;
-  }
-
-  if (product.order?.title) {
-    return product.order.title;
-  }
-
-  if (product.order === null || product.order === undefined) {
-    return "";
-  }
-
-  return String(product.order);
-};
 
 export const ProductsPage = () => {
   const dispatch = useDispatch();
@@ -94,87 +70,19 @@ export const ProductsPage = () => {
         <div className="products-page__state">Loading products...</div>
       )}
 
-      <div className="products-page__filters">
-        <label className="products-page__filter">
-          <span className="products-page__filter-label">Type</span>
-          <select
-            className="products-page__select"
-            value={selectedType}
-            onChange={handleTypeChange}
-          >
-            <option value="all">All types</option>
-            {productTypes.map((type) => (
-              <option value={type} key={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {productSpecifications.length > 0 && (
-          <label className="products-page__filter">
-            <span className="products-page__filter-label">Specification</span>
-            <select
-              className="products-page__select"
-              value={selectedSpecification}
-              onChange={handleSpecificationChange}
-            >
-              <option value="all">All specifications</option>
-              {productSpecifications.map((specification) => (
-                <option value={specification} key={specification}>
-                  {specification}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-      </div>
+      <ProductsFilters
+        productTypes={productTypes}
+        productSpecifications={productSpecifications}
+        selectedType={selectedType}
+        selectedSpecification={selectedSpecification}
+        onTypeChange={handleTypeChange}
+        onSpecificationChange={handleSpecificationChange}
+      />
 
       {filteredProducts.length === 0 ? (
         <div className="products-page__state">No products match filters.</div>
       ) : (
-        <ul className="products-page__list">
-          {filteredProducts.map((product, index) => {
-            const usdPrice = findPrice(product.price, "USD");
-            const uahPrice = findPrice(product.price, "UAH");
-
-            return (
-              <li
-                className="products-page__item"
-                key={product.id ?? product._id ?? product.serialNumber ?? index}
-              >
-                <article className="products-page__product">
-                  <span className="products-page__title">{product.title}</span>
-                  <span className="products-page__type">{product.type}</span>
-                  <span className="products-page__specification">
-                    {product.specification}
-                  </span>
-                  <span className="products-page__serial-number">
-                    {product.serialNumber}
-                  </span>
-                  <span className="products-page__guarantee-start">
-                    {formatShortDate(product.guarantee?.start)}
-                  </span>
-                  <span className="products-page__guarantee-end">
-                    {formatShortDate(product.guarantee?.end)}
-                  </span>
-                  <span className="products-page__price-usd">
-                    {formatPrice(usdPrice?.value, usdPrice?.symbol)}
-                  </span>
-                  <span className="products-page__price-uah">
-                    {formatPrice(uahPrice?.value, uahPrice?.symbol)}
-                  </span>
-                  <span className="products-page__order-title">
-                    {getOrderTitle(product)}
-                  </span>
-                  <span className="products-page__date">
-                    {formatLongDate(product.date)}
-                  </span>
-                </article>
-              </li>
-            );
-          })}
-        </ul>
+        <ProductsList products={filteredProducts} />
       )}
     </section>
   );

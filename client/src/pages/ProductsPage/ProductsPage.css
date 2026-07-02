@@ -14,6 +14,7 @@
 
 .products-page__select {
   min-width: 180px;
+  min-height: 36px;
 }
 
 .products-page__list {
@@ -28,12 +29,118 @@
 
 .products-page__product {
   display: grid;
-  grid-template-columns:
-    minmax(160px, 2fr)
-    minmax(100px, 1fr)
-    minmax(120px, 1fr)
-    minmax(90px, 1fr)
-    repeat(6, minmax(100px, 1fr));
-  gap: 8px;
+  grid-template-columns: 12px 56px minmax(180px, 2fr) repeat(6, minmax(100px, 1fr));
+  gap: 12px;
   align-items: center;
+  padding: 12px;
+  border: 1px solid #d9dee3;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.products-page__status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.products-page__status-dot--new {
+  background: #22c55e;
+}
+
+.products-page__photo {
+  display: flex;
+  width: 56px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #d9dee3;
+  border-radius: 4px;
+  background: #f8fafc;
+}
+
+.products-page__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.products-page__image-placeholder {
+  color: #64748b;
+  font-size: 11px;
+  text-align: center;
+}
+
+.products-page__main-info,
+.products-page__guarantee,
+.products-page__prices {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.products-page__title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.products-page__serial-number,
+.products-page__guarantee-label,
+.products-page__price-uah,
+.products-page__date {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.products-page__type,
+.products-page__specification,
+.products-page__order-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .products-page__product {
+    grid-template-columns: 12px 56px minmax(180px, 1fr) minmax(120px, 1fr);
+  }
+
+  .products-page__specification,
+  .products-page__guarantee,
+  .products-page__prices,
+  .products-page__order-title,
+  .products-page__date {
+    grid-column: 3 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .products-page__filters,
+  .products-page__filter,
+  .products-page__select {
+    width: 100%;
+  }
+
+  .products-page__product {
+    grid-template-columns: 10px 48px minmax(0, 1fr);
+  }
+
+  .products-page__photo {
+    width: 48px;
+    height: 40px;
+  }
+
+  .products-page__type,
+  .products-page__specification,
+  .products-page__guarantee,
+  .products-page__prices,
+  .products-page__order-title,
+  .products-page__date {
+    grid-column: 3 / -1;
+  }
 }
