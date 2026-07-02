@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import "./TopMenu.css";
 
 const formatWeekday = (date) =>
   date.toLocaleDateString("en-US", { weekday: "long" });
@@ -33,12 +34,24 @@ const TopMenu = () => {
   }, []);
 
   return (
-    <ul>
-      <li>{formatWeekday(currentDate)}</li>
-      <li>{formatDate(currentDate)}</li>
-      <li>{formatTime(currentDate)}</li>
-      <li>Sessions: {activeSessions}</li>
-    </ul>
+    <header className="top-menu">
+      <div className="top-menu__brand">
+        <span className="top-menu__logo" aria-hidden="true" />
+        <span className="top-menu__brand-text">INVENTORY</span>
+      </div>
+
+      <label className="top-menu__search">
+        <span className="top-menu__search-label">Поиск</span>
+        <input className="top-menu__search-input" type="search" />
+      </label>
+
+      <ul className="top-menu__meta">
+        <li className="top-menu__weekday">{formatWeekday(currentDate)}</li>
+        <li className="top-menu__date">{formatDate(currentDate)}</li>
+        <li className="top-menu__time">{formatTime(currentDate)}</li>
+        <li className="top-menu__sessions">Sessions: {activeSessions}</li>
+      </ul>
+    </header>
   );
 };
 

@@ -1,0 +1,122 @@
+.navigation-menu {
+  position: sticky;
+  top: 72px;
+  align-self: start;
+  min-height: calc(100vh - 72px);
+  padding: 48px 30px 28px;
+  background: var(--color-surface);
+  box-shadow: 8px 0 28px rgb(53 73 84 / 10%);
+}
+
+.navigation-menu__profile {
+  position: relative;
+  width: 96px;
+  margin: 0 auto 54px;
+}
+
+.navigation-menu__avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 34%, #f1c8a9 0 16%, transparent 17%),
+    radial-gradient(circle at 50% 80%, #263944 0 32%, transparent 33%),
+    linear-gradient(145deg, #f1d0b8, #b66f48);
+  box-shadow: var(--shadow-card);
+}
+
+.navigation-menu__settings {
+  position: absolute;
+  right: -8px;
+  bottom: -2px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #6b7f8b;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+
+.navigation-menu__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.navigation-menu__link {
+  position: relative;
+  width: fit-content;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.navigation-menu__link::after {
+  position: absolute;
+  right: 0;
+  bottom: -7px;
+  left: 0;
+  height: 3px;
+  background: var(--color-accent);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.navigation-menu__link--active::after,
+.navigation-menu__link:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.navigation-menu__link--static {
+  cursor: default;
+}
+
+@media (max-width: 900px) {
+  .navigation-menu {
+    padding: 36px 20px;
+  }
+
+  .navigation-menu__profile {
+    width: 76px;
+  }
+
+  .navigation-menu__avatar {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+@media (max-width: 640px) {
+  .navigation-menu {
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 18;
+    min-height: 0;
+    padding: 10px 12px;
+  }
+
+  .navigation-menu__profile,
+  .navigation-menu__link--static {
+    display: none;
+  }
+
+  .navigation-menu__nav {
+    flex-direction: row;
+    justify-content: center;
+    gap: 34px;
+  }
+}
