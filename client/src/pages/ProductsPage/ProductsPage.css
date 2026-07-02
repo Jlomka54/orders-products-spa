@@ -1,0 +1,213 @@
+.products-page {
+  overflow-x: auto;
+}
+
+.products-page::before {
+  display: inline-block;
+  margin: 0 32px 42px 0;
+  color: var(--color-text);
+  font-size: clamp(26px, 3vw, 30px);
+  font-weight: 800;
+  content: "Продукты";
+}
+
+.products-page__filters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 26px;
+  align-items: center;
+  margin-bottom: 42px;
+}
+
+.products-page__filter {
+  display: grid;
+  grid-template-columns: auto minmax(200px, 300px);
+  gap: 10px;
+  align-items: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.products-page__select {
+  min-width: 220px;
+  min-height: 34px;
+  padding: 6px 36px 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-text);
+  background:
+    linear-gradient(45deg, transparent 50%, #9aadb7 50%) right 14px center / 6px 6px no-repeat,
+    linear-gradient(135deg, #9aadb7 50%, transparent 50%) right 10px center / 6px 6px no-repeat,
+    #fff;
+  box-shadow: inset 0 1px 2px rgb(53 73 84 / 8%);
+  appearance: none;
+}
+
+.products-page__list {
+  min-width: 980px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.products-page__item + .products-page__item {
+  margin-top: 8px;
+}
+
+.products-page__product {
+  display: grid;
+  grid-template-columns: 12px 56px minmax(260px, 2.2fr) minmax(120px, 0.8fr) minmax(150px, 1fr) minmax(150px, 1.1fr) minmax(120px, 0.8fr) minmax(240px, 1.6fr) minmax(150px, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-height: 70px;
+  padding: 10px 18px 10px 26px;
+  border: 1px solid #d9dee3;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.products-page__status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.products-page__status-dot--new {
+  background: #c9dc2d;
+}
+
+.products-page__photo {
+  display: flex;
+  width: 56px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #d9dee3;
+  border-radius: 3px;
+  background: #f8fafc;
+}
+
+.products-page__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.products-page__image-placeholder {
+  color: #64748b;
+  font-size: 11px;
+  text-align: center;
+}
+
+.products-page__main-info,
+.products-page__guarantee,
+.products-page__prices {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.products-page__title {
+  overflow: hidden;
+  color: #435966;
+  font-weight: 600;
+  text-decoration: underline;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.products-page__serial-number,
+.products-page__guarantee-label,
+.products-page__price-uah,
+.products-page__date {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.products-page__price-usd {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.products-page__price-uah {
+  color: #557081;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.products-page__type,
+.products-page__specification,
+.products-page__order-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.products-page__order-title {
+  color: #6f8794;
+  font-size: 18px;
+  text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+  .products-page {
+    overflow-x: visible;
+  }
+
+  .products-page__list {
+    min-width: 0;
+  }
+
+  .products-page__product {
+    grid-template-columns: 12px 56px minmax(180px, 1fr) minmax(120px, 0.8fr);
+  }
+
+  .products-page__specification,
+  .products-page__guarantee,
+  .products-page__prices,
+  .products-page__order-title,
+  .products-page__date {
+    grid-column: 3 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .products-page::before {
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .products-page__filters,
+  .products-page__filter,
+  .products-page__select {
+    width: 100%;
+  }
+
+  .products-page__filter {
+    grid-template-columns: 1fr;
+  }
+
+  .products-page__product {
+    grid-template-columns: 10px 48px minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  .products-page__photo {
+    width: 48px;
+    height: 40px;
+  }
+
+  .products-page__type,
+  .products-page__specification,
+  .products-page__guarantee,
+  .products-page__prices,
+  .products-page__order-title,
+  .products-page__date {
+    grid-column: 3 / -1;
+  }
+}

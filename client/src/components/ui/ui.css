@@ -1,0 +1,57 @@
+.ui-loader,
+.ui-error-message,
+.ui-empty-state {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: fit-content;
+  padding: 14px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.ui-loader__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #cbd5e1;
+  border-top-color: #475569;
+  border-radius: 50%;
+  animation: ui-loader-spin 800ms linear infinite;
+}
+
+.ui-error-message {
+  color: #b91c1c;
+}
+
+.ui-empty-state {
+  color: #64748b;
+}
+
+.ui-status-badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.ui-status-badge--new {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.ui-status-badge--used {
+  color: #334155;
+  background: #e2e8f0;
+}
+
+@keyframes ui-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,353 @@
+.orders-page {
+  position: relative;
+}
+
+.orders-page::before {
+  display: block;
+  margin: 0 0 64px;
+  color: var(--color-text);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 800;
+  content: "Приходы";
+}
+
+.orders-page__content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.orders-page__list,
+.orders-page__details-products {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.orders-page__list {
+  flex: 1;
+  min-width: 360px;
+}
+
+.orders-page__item + .orders-page__item {
+  margin-top: 10px;
+}
+
+.orders-page__order {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.orders-page__order:hover,
+.orders-page__order--selected {
+  border-color: #b8c8d1;
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-1px);
+}
+
+.orders-page__order-main {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) 82px minmax(94px, 0.8fr) minmax(130px, 1fr) minmax(110px, 0.8fr) minmax(130px, 1fr);
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  min-height: 72px;
+  padding: 12px 22px 12px 34px;
+  border: 0;
+  color: var(--color-text);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.orders-page__title {
+  overflow: hidden;
+  color: #557081;
+  font-size: 20px;
+  text-decoration: underline;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orders-page__products-count {
+  position: relative;
+  padding-left: 54px;
+  color: #587184;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.orders-page__products-count::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: #607887;
+  font-size: 22px;
+  content: "☷";
+  transform: translateY(-50%);
+}
+
+.orders-page__products-count::after {
+  display: block;
+  color: var(--color-muted);
+  font-size: 13px;
+  content: "Продукта";
+}
+
+.orders-page__short-date {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.orders-page__long-date,
+.orders-page__total-uah {
+  color: #4d6879;
+  font-size: 16px;
+}
+
+.orders-page__total-usd {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.orders-page__delete-button {
+  align-self: stretch;
+  min-width: 54px;
+  border: 0;
+  color: #94a8b4;
+  background: transparent;
+  cursor: pointer;
+}
+
+.orders-page__delete-button:hover {
+  color: #b91c1c;
+  background: #f8fafc;
+}
+
+.orders-page__details-panel {
+  position: relative;
+  flex: 1.9;
+  min-width: 420px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  opacity: 0;
+  transform: translateX(12px);
+}
+
+.orders-page__details-panel--visible {
+  animation: orders-page-details-enter 180ms ease-out forwards;
+}
+
+.orders-page__details-products {
+  margin-top: 0;
+}
+
+.orders-page__details-header {
+  padding: 28px 38px 16px;
+  border-bottom: 1px solid #e3eaee;
+}
+
+.orders-page__details-title {
+  margin: 0 0 16px;
+  color: var(--color-text);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.orders-page__details-dates,
+.orders-page__details-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--color-muted);
+}
+
+.orders-page__details-totals {
+  padding: 0 38px 18px;
+}
+
+.orders-page__details-total {
+  color: #557081;
+  font-weight: 700;
+}
+
+.orders-page__details-product {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 12px 38px;
+  border-top: 1px solid #e3eaee;
+}
+
+.orders-page__details-product::before {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #c8db26;
+  content: "";
+}
+
+.orders-page__details-product-title {
+  overflow: hidden;
+  color: var(--color-text);
+  text-decoration: underline;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orders-page__details-product-price {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.orders-page__modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(70 91 101 / 58%);
+  backdrop-filter: blur(1px);
+}
+
+.orders-page__modal {
+  position: relative;
+  width: min(790px, 100%);
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--color-surface);
+  box-shadow: 0 24px 70px rgb(53 73 84 / 32%);
+}
+
+.orders-page__modal::before {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 50%;
+  color: #91a5b0;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  content: "×";
+  font-size: 28px;
+}
+
+.orders-page__modal-title {
+  margin: 0;
+  padding: 28px 36px;
+  color: var(--color-text);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.orders-page__modal-text {
+  margin: 0;
+  padding: 0 36px 24px;
+  color: #557081;
+}
+
+.orders-page__modal-actions {
+  display: flex;
+  gap: 24px;
+  justify-content: flex-end;
+  padding: 26px 36px;
+  background: var(--color-accent);
+}
+
+.orders-page__modal-button {
+  min-width: 124px;
+  padding: 13px 20px;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.orders-page__modal-button--danger {
+  color: #ef3d58;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.orders-page__modal-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (max-width: 1160px) {
+  .orders-page::before {
+    margin-bottom: 34px;
+  }
+
+  .orders-page__content {
+    flex-direction: column;
+  }
+
+  .orders-page__list,
+  .orders-page__details-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .orders-page__order-main {
+    grid-template-columns: minmax(220px, 2fr) 82px repeat(2, minmax(110px, 1fr));
+  }
+
+  .orders-page__total-usd,
+  .orders-page__total-uah {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .orders-page__order-main {
+    grid-template-columns: 1fr 90px;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .orders-page__title {
+    grid-column: 1 / -1;
+    font-size: 17px;
+  }
+
+  .orders-page__details-header,
+  .orders-page__details-totals,
+  .orders-page__details-product {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}
+
+@keyframes orders-page-details-enter {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
