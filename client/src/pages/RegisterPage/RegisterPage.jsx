@@ -15,8 +15,7 @@ const RegisterPage = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isLoading = useSelector(selectAuthLoading);
   const authError = useSelector(selectAuthError);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
 
@@ -27,16 +26,10 @@ const RegisterPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const trimmedName = name.trim();
-    const trimmedEmail = email.trim();
+    const trimmedUsername = username.trim();
 
-    if (!trimmedName) {
+    if (!trimmedUsername) {
       setFormError("Name is required");
-      return;
-    }
-
-    if (!trimmedEmail) {
-      setFormError("Email is required");
       return;
     }
 
@@ -55,9 +48,7 @@ const RegisterPage = () => {
     try {
       await dispatch(
         registerUser({
-          name: trimmedName,
-          email: trimmedEmail,
-          username: trimmedEmail,
+          username: trimmedUsername,
           password,
         }),
       ).unwrap();
@@ -77,20 +68,9 @@ const RegisterPage = () => {
           <input
             className="register-page__input"
             type="text"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            autoComplete="name"
-          />
-        </label>
-
-        <label className="register-page__field">
-          <span className="register-page__label">Email</span>
-          <input
-            className="register-page__input"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            autoComplete="username"
           />
         </label>
 

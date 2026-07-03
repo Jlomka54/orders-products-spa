@@ -88,9 +88,10 @@
 
 .top-menu__meta {
   display: grid;
-  grid-template-columns: repeat(2, auto);
+  grid-template-columns: repeat(3, auto);
   gap: 4px 16px;
   justify-content: end;
+  align-items: center;
   padding: 0;
   margin: 0;
   list-style: none;
@@ -117,8 +118,38 @@
 }
 
 .top-menu__sessions {
+  grid-column: 1 / -1;
   color: var(--color-muted);
   font-size: 12px;
+}
+
+.top-menu__logout-item {
+  display: flex;
+}
+
+.top-menu__logout {
+  min-height: 32px;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 5px;
+  color: #fff;
+  background: #d93025;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.top-menu__logout:hover {
+  background: #b3261e;
+  box-shadow: 0 6px 14px rgb(217 48 37 / 20%);
+}
+
+.top-menu__logout:active {
+  transform: translateY(1px);
 }
 
 @media (max-width: 900px) {
