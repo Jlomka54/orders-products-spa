@@ -15,7 +15,7 @@ const LoginPage = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const isLoading = useSelector(selectAuthLoading);
   const authError = useSelector(selectAuthError);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
 
@@ -26,10 +26,10 @@ const LoginPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const trimmedEmail = email.trim();
+    const trimmedUsername = username.trim();
 
-    if (!trimmedEmail) {
-      setFormError("Email is required");
+    if (!trimmedUsername) {
+      setFormError("Name is required");
       return;
     }
 
@@ -43,8 +43,7 @@ const LoginPage = () => {
     try {
       await dispatch(
         loginUser({
-          email: trimmedEmail,
-          username: trimmedEmail,
+          username: trimmedUsername,
           password,
         }),
       ).unwrap();
@@ -60,13 +59,13 @@ const LoginPage = () => {
         <h1 className="login-page__title">Login</h1>
 
         <label className="login-page__field">
-          <span className="login-page__label">Email</span>
+          <span className="login-page__label">Name</span>
           <input
             className="login-page__input"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
+            type="text"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            autoComplete="username"
           />
         </label>
 

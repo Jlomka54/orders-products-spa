@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../features/auth/authSlice";
 import "./TopMenu.css";
 
 const formatWeekday = (date) =>
@@ -20,6 +21,7 @@ const formatTime = (date) =>
   });
 
 const TopMenu = () => {
+  const dispatch = useDispatch();
   const activeSessions = useSelector((state) => state.ui.activeSessions);
   const [currentDate, setCurrentDate] = useState(() => new Date());
 
@@ -49,6 +51,15 @@ const TopMenu = () => {
         <li className="top-menu__weekday">{formatWeekday(currentDate)}</li>
         <li className="top-menu__date">{formatDate(currentDate)}</li>
         <li className="top-menu__time">{formatTime(currentDate)}</li>
+        <li className="top-menu__logout-item">
+          <button
+            className="top-menu__logout"
+            type="button"
+            onClick={() => dispatch(logout())}
+          >
+            Выход
+          </button>
+        </li>
         <li className="top-menu__sessions">Sessions: {activeSessions}</li>
       </ul>
     </header>
