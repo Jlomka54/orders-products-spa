@@ -6,12 +6,12 @@
 .main-layout__body {
   display: grid;
   grid-template-columns: 200px minmax(0, 1fr);
-  min-height: calc(100vh - 72px);
+  min-height: calc(100vh - 73px);
 }
 
 .main-layout__content {
   min-width: 0;
-  padding: 68px clamp(24px, 6vw, 124px);
+  padding: 68px clamp(24px, 6.4vw, 123px);
 }
 
 @media (max-width: 900px) {

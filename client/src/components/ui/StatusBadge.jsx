@@ -11,7 +11,7 @@ const StatusBadge = ({ isNew }) => {
         statusIsNew ? " ui-status-badge--new" : " ui-status-badge--used"
       }`}
     >
-      {statusIsNew ? "Новый" : "Б/У"}
+      {statusIsNew ? "новый" : "Б / У"}
     </span>
   );
 };

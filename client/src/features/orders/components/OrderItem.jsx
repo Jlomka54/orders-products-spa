@@ -43,10 +43,9 @@ const OrderItem = ({ order, isSelected, onSelect, onDelete }) => {
       <button
         className="orders-page__delete-button"
         type="button"
+        aria-label="Удалить приход"
         onClick={onDelete}
-      >
-        Delete
-      </button>
+      />
     </div>
   );
 };

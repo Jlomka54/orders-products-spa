@@ -87,6 +87,17 @@ const OrdersPage = () => {
 
   return (
     <section className="orders-page">
+      <header className="orders-page__header">
+        <button
+          className="orders-page__add-button"
+          type="button"
+          aria-label="Добавить приход"
+        >
+          +
+        </button>
+        <h1 className="orders-page__heading">Приходы / {orders.length}</h1>
+      </header>
+
       {(error || isLoading) && (
         <div className="orders-page__status">
           {error && (

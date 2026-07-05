@@ -59,6 +59,21 @@ export const ProductsPage = () => {
 
   return (
     <section className="products-page">
+      <header className="products-page__header">
+        <h1 className="products-page__heading">
+          Продукты / {products.length}
+        </h1>
+
+        <ProductsFilters
+          productTypes={productTypes}
+          productSpecifications={productSpecifications}
+          selectedType={selectedType}
+          selectedSpecification={selectedSpecification}
+          onTypeChange={handleTypeChange}
+          onSpecificationChange={handleSpecificationChange}
+        />
+      </header>
+
       {error && (
         <ErrorMessage message={`Failed to load products: ${error}`} />
       )}
@@ -66,15 +81,6 @@ export const ProductsPage = () => {
       {isLoading && (
         <Loader text="Loading products..." />
       )}
-
-      <ProductsFilters
-        productTypes={productTypes}
-        productSpecifications={productSpecifications}
-        selectedType={selectedType}
-        selectedSpecification={selectedSpecification}
-        onTypeChange={handleTypeChange}
-        onSpecificationChange={handleSpecificationChange}
-      />
 
       {filteredProducts.length === 0 ? (
         <EmptyState message="No products match filters." />

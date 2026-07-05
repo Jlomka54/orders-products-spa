@@ -3,7 +3,7 @@ export const getOrderId = (order) => {
     return null;
   }
 
-  return order.legacyId ?? order.id ?? order._id ?? null;
+  return order._id ?? order.legacyId ?? order.id ?? null;
 };
 
 export const getOrderRequestId = (order) => getOrderId(order);

@@ -12,7 +12,7 @@ const NavigationMenu = () => {
         <button
           className="navigation-menu__settings"
           type="button"
-          aria-label="Settings"
+          aria-label="Настройки"
         >
           ⚙
         </button>
