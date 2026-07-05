@@ -2,14 +2,19 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   deleteOrderApi,
   getOrderByIdApi,
-  getOrdersApi,
+  getOrdersWithDetailsApi,
 } from "../../api/ordersApi";
+import {
+  getOrderId,
+  isSameOrder,
+  normalizeOrder,
+} from "../../utils/orderHelpers";
 
 export const fetchOrders = createAsyncThunk(
   "orders/fetchOrders",
   async (_, { rejectWithValue }) => {
     try {
-      return await getOrdersApi();
+      return await getOrdersWithDetailsApi();
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -62,8 +67,6 @@ const setRejectedState = (state, action) => {
   state.error = action.payload || action.error.message || "Orders request failed";
 };
 
-const getOrderId = (order) => String(order.id ?? order._id);
-
 const ordersSlice = createSlice({
   name: "orders",
   initialState,
@@ -86,31 +89,36 @@ const ordersSlice = createSlice({
     builder
       .addCase(fetchOrders.pending, setPendingState)
       .addCase(fetchOrders.fulfilled, (state, action) => {
-        state.items = Array.isArray(action.payload) ? action.payload : [];
+        state.items = Array.isArray(action.payload)
+          ? action.payload.map((order) => normalizeOrder(order))
+          : [];
         state.isLoading = false;
         state.error = null;
       })
       .addCase(fetchOrders.rejected, setRejectedState)
       .addCase(fetchOrderById.pending, setPendingState)
       .addCase(fetchOrderById.fulfilled, (state, action) => {
-        state.selectedOrderDetails = action.payload;
+        state.selectedOrderDetails = normalizeOrder(action.payload);
         state.isLoading = false;
         state.error = null;
       })
       .addCase(fetchOrderById.rejected, setRejectedState)
       .addCase(removeOrder.pending, setPendingState)
       .addCase(removeOrder.fulfilled, (state, action) => {
-        const removedOrderId = String(action.payload.orderId);
+        const removedOrderId = action.payload.orderId;
 
         state.items = state.items.filter(
-          (order) => getOrderId(order) !== removedOrderId,
+          (order) => !isSameOrder(getOrderId(order), removedOrderId),
         );
         state.deleteModalOrderId = null;
         state.isLoading = false;
         state.error = null;
 
-        if (String(state.selectedOrderId) === removedOrderId) {
+        if (isSameOrder(state.selectedOrderId, removedOrderId)) {
           state.selectedOrderId = null;
+        }
+
+        if (isSameOrder(getOrderId(state.selectedOrderDetails), removedOrderId)) {
           state.selectedOrderDetails = null;
         }
       })
