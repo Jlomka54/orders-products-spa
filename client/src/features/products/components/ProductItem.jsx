@@ -94,6 +94,12 @@ const ProductItem = ({ product }) => {
       <span className="products-page__date">
         {formatLongDate(product.date)}
       </span>
+
+      <button
+        className="products-page__delete-button"
+        type="button"
+        aria-label="Удалить продукт"
+      />
     </article>
   );
 };

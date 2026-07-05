@@ -1,6 +1,8 @@
+import {
+  getOrderId,
+  isSameOrder,
+} from "../../../utils/orderHelpers";
 import OrderItem from "./OrderItem";
-
-const getOrderId = (order) => order.id ?? order._id;
 
 const OrdersList = ({
   orders,
@@ -12,7 +14,12 @@ const OrdersList = ({
     <ul className="orders-page__list">
       {orders.map((order, index) => {
         const orderId = getOrderId(order);
-        const isSelected = String(orderId) === String(selectedOrderId);
+
+        if (orderId === null) {
+          return null;
+        }
+
+        const isSelected = isSameOrder(orderId, selectedOrderId);
 
         return (
           <li className="orders-page__item" key={orderId ?? index}>

@@ -58,11 +58,17 @@ export const getOrderById = async (req, res) => {
       });
     }
 
-    const products =
-      order.legacyId === undefined ? [] : await Product.find({ order: order.legacyId });
+    const orderObject = order.toObject();
+    const embeddedProducts = Array.isArray(orderObject.products)
+      ? orderObject.products
+      : [];
+    const productOrderId = orderObject.legacyId ?? orderObject.id;
+    const linkedProducts =
+      productOrderId === undefined ? [] : await Product.find({ order: productOrderId });
+    const products = linkedProducts.length > 0 ? linkedProducts : embeddedProducts;
 
     return res.json({
-      ...order.toObject(),
+      ...orderObject,
       products,
     });
   } catch (error) {

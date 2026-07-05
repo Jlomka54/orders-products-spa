@@ -9,13 +9,29 @@ const DeleteOrderModal = ({
     return null;
   }
 
+  const orderTitle = order?.title || "этот приход";
+
   return (
     <div className="orders-page__modal-backdrop">
       <div className="orders-page__modal" role="dialog" aria-modal="true">
-        <h2 className="orders-page__modal-title">Delete order</h2>
-        <p className="orders-page__modal-text">
-          Are you sure you want to delete {order?.title || "this order"}?
-        </p>
+        <button
+          className="orders-page__modal-close"
+          type="button"
+          aria-label="Закрыть"
+          onClick={onClose}
+          disabled={isLoading}
+        />
+        <h2 className="orders-page__modal-title">
+          Вы уверены, что хотите удалить этот приход?
+        </h2>
+        <div className="orders-page__modal-product">
+          <span className="orders-page__modal-dot" aria-hidden="true" />
+          <span className="orders-page__modal-photo" aria-hidden="true" />
+          <span className="orders-page__modal-product-info">
+            <span className="orders-page__modal-product-title">{orderTitle}</span>
+            <span className="orders-page__modal-product-serial">SN-12.3456789</span>
+          </span>
+        </div>
         <div className="orders-page__modal-actions">
           <button
             className="orders-page__modal-button"
@@ -23,7 +39,7 @@ const DeleteOrderModal = ({
             onClick={onClose}
             disabled={isLoading}
           >
-            Cancel
+            Отменить
           </button>
           <button
             className="orders-page__modal-button orders-page__modal-button--danger"
@@ -31,7 +47,7 @@ const DeleteOrderModal = ({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? "Удаление..." : "Удалить"}
           </button>
         </div>
       </div>

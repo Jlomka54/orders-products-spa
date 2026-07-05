@@ -1,3 +1,5 @@
+import { createSelector } from "@reduxjs/toolkit";
+
 export const selectProducts = (state) => state.products.items;
 
 export const selectProductsLoading = (state) => state.products.isLoading;
@@ -9,32 +11,38 @@ export const selectSelectedType = (state) => state.products.selectedType;
 export const selectSelectedSpecification = (state) =>
   state.products.selectedSpecification;
 
-export const selectProductTypes = (state) =>
+export const selectProductTypes = createSelector([selectProducts], (products) =>
   Array.from(
     new Set(
-      state.products.items
+      products
         .map((product) => product.type)
         .filter(Boolean),
     ),
-  );
+  ));
 
-export const selectProductSpecifications = (state) =>
-  Array.from(
-    new Set(
-      state.products.items
-        .map((product) => product.specification)
-        .filter(Boolean),
+export const selectProductSpecifications = createSelector(
+  [selectProducts],
+  (products) =>
+    Array.from(
+      new Set(
+        products
+          .map((product) => product.specification)
+          .filter(Boolean),
+      ),
     ),
-  );
+);
 
-export const selectFilteredProducts = (state) =>
-  state.products.items.filter((product) => {
+export const selectFilteredProducts = createSelector(
+  [selectProducts, selectSelectedType, selectSelectedSpecification],
+  (products, selectedType, selectedSpecification) =>
+    products.filter((product) => {
     const matchesType =
-      state.products.selectedType === "all" ||
-      product.type === state.products.selectedType;
+      selectedType === "all" ||
+      product.type === selectedType;
     const matchesSpecification =
-      state.products.selectedSpecification === "all" ||
-      product.specification === state.products.selectedSpecification;
+      selectedSpecification === "all" ||
+      product.specification === selectedSpecification;
 
     return matchesType && matchesSpecification;
-  });
+  }),
+);

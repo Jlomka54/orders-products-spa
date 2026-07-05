@@ -33,21 +33,20 @@
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
+  padding: 0;
   font-size: 12px;
   font-weight: 700;
   line-height: 1.4;
 }
 
 .ui-status-badge--new {
-  color: #166534;
-  background: #dcfce7;
+  color: #c2d22a;
+  background: transparent;
 }
 
 .ui-status-badge--used {
-  color: #334155;
-  background: #e2e8f0;
+  color: var(--color-text);
+  background: transparent;
 }
 
 @keyframes ui-loader-spin {

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  selectDeleteModalOrder,
   selectDeleteModalOrderId,
   selectOrders,
   selectOrdersError,
@@ -22,9 +23,11 @@ import OrdersList from "../../features/orders/components/OrdersList";
 import EmptyState from "../../components/ui/EmptyState";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
+import {
+  getOrderId,
+  isSameOrder,
+} from "../../utils/orderHelpers";
 import "./OrdersPage.css";
-
-const getOrderId = (order) => order.id ?? order._id;
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
@@ -34,19 +37,16 @@ const OrdersPage = () => {
   const selectedOrderId = useSelector(selectSelectedOrderId);
   const selectedOrderDetails = useSelector(selectSelectedOrderDetails);
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
+  const deleteModalOrder = useSelector(selectDeleteModalOrder);
 
-  const deleteModalOrder =
-    orders.find((order) => String(getOrderId(order)) === String(deleteModalOrderId)) ||
-    null;
-  const selectedDetailsId =
-    selectedOrderDetails === null ? null : getOrderId(selectedOrderDetails);
+  const selectedDetailsId = getOrderId(selectedOrderDetails);
   const activeSelectedOrderDetails =
-    selectedOrderDetails &&
-    (selectedDetailsId === null ||
-      selectedDetailsId === undefined ||
-      String(selectedDetailsId) === String(selectedOrderId))
+    isSameOrder(selectedDetailsId, selectedOrderId)
       ? selectedOrderDetails
       : null;
+  const hasOrders = orders.length > 0;
+  const isInitialLoading = isLoading && !hasOrders;
+  const hasBlockingError = error && !hasOrders;
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -73,26 +73,41 @@ const OrdersPage = () => {
     dispatch(removeOrder(deleteModalOrderId));
   };
 
-  if (isLoading && orders.length === 0) {
+  if (isInitialLoading) {
     return <Loader text="Loading orders..." />;
   }
 
-  if (error && orders.length === 0) {
+  if (hasBlockingError) {
     return <ErrorMessage message={`Failed to load orders: ${error}`} />;
   }
 
-  if (orders.length === 0) {
+  if (!hasOrders) {
     return <EmptyState message="No orders found." />;
   }
 
   return (
     <section className="orders-page">
-      {error && (
-        <ErrorMessage message={`Failed to load orders: ${error}`} />
-      )}
+      <header className="orders-page__header">
+        <button
+          className="orders-page__add-button"
+          type="button"
+          aria-label="Добавить приход"
+        >
+          +
+        </button>
+        <h1 className="orders-page__heading">Приходы / {orders.length}</h1>
+      </header>
 
-      {isLoading && (
-        <Loader text="Loading orders..." />
+      {(error || isLoading) && (
+        <div className="orders-page__status">
+          {error && (
+            <ErrorMessage message={`Failed to load orders: ${error}`} />
+          )}
+
+          {isLoading && (
+            <Loader text="Loading orders..." />
+          )}
+        </div>
       )}
 
       <div className="orders-page__content">

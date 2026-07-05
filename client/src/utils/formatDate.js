@@ -29,9 +29,9 @@ export const formatLongDate = (date) => {
     return "";
   }
 
-  return parsedDate.toLocaleDateString("en-US", {
+  return parsedDate.toLocaleDateString("ru-RU", {
     day: "2-digit",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
 };

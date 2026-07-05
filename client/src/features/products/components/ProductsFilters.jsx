@@ -9,13 +9,13 @@ const ProductsFilters = ({
   return (
     <div className="products-page__filters">
       <label className="products-page__filter">
-        <span className="products-page__filter-label">Type</span>
+        <span className="products-page__filter-label">Тип:</span>
         <select
           className="products-page__select"
           value={selectedType}
           onChange={onTypeChange}
         >
-          <option value="all">All types</option>
+          <option value="all">Все типы</option>
           {productTypes.map((type) => (
             <option value={type} key={type}>
               {type}
@@ -26,13 +26,13 @@ const ProductsFilters = ({
 
       {productSpecifications.length > 0 && (
         <label className="products-page__filter">
-          <span className="products-page__filter-label">Specification</span>
+          <span className="products-page__filter-label">Спецификация:</span>
           <select
             className="products-page__select"
             value={selectedSpecification}
             onChange={onSpecificationChange}
           >
-            <option value="all">All specifications</option>
+            <option value="all">Все спецификации</option>
             {productSpecifications.map((specification) => (
               <option value={specification} key={specification}>
                 {specification}

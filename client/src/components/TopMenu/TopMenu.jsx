@@ -4,20 +4,19 @@ import { logout } from "../../features/auth/authSlice";
 import "./TopMenu.css";
 
 const formatWeekday = (date) =>
-  date.toLocaleDateString("en-US", { weekday: "long" });
+  date.toLocaleDateString("ru-RU", { weekday: "long" });
 
 const formatDate = (date) =>
-  date.toLocaleDateString("en-US", {
+  date.toLocaleDateString("ru-RU", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
 
 const formatTime = (date) =>
-  date.toLocaleTimeString("en-US", {
+  date.toLocaleTimeString("ru-RU", {
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
   });
 
 const TopMenu = () => {

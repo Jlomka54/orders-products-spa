@@ -1,28 +1,11 @@
 import { calculateOrderTotal } from "../../../utils/calculateOrderTotal";
 import { formatLongDate, formatShortDate } from "../../../utils/formatDate";
 import { formatPrice } from "../../../utils/formatPrice";
-
-const getOrderProducts = (order) => {
-  if (Array.isArray(order.products)) {
-    return order.products;
-  }
-
-  if (Array.isArray(order.items)) {
-    return order.items;
-  }
-
-  return [];
-};
-
-const getProductsCount = (order) => {
-  if (Number.isFinite(Number(order.productsCount))) {
-    return Number(order.productsCount);
-  }
-
-  return getOrderProducts(order).length;
-};
-
-const getOrderDate = (order) => order.date || order.createdAt;
+import {
+  getOrderDate,
+  getOrderProducts,
+  getProductsCount,
+} from "../../../utils/orderHelpers";
 
 const OrderItem = ({ order, isSelected, onSelect, onDelete }) => {
   const products = getOrderProducts(order);
@@ -60,10 +43,9 @@ const OrderItem = ({ order, isSelected, onSelect, onDelete }) => {
       <button
         className="orders-page__delete-button"
         type="button"
+        aria-label="Удалить приход"
         onClick={onDelete}
-      >
-        Delete
-      </button>
+      />
     </div>
   );
 };
