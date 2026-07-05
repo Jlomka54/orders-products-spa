@@ -1,0 +1,32 @@
+### Get all orders
+GET http://localhost:3000/api/orders
+
+### Get order by MongoDB _id
+GET http://localhost:3000/api/orders/:id
+
+### Get order by legacyId
+GET http://localhost:3000/api/orders/1
+
+### Delete order by legacyId
+DELETE http://localhost:3000/api/orders/1
+
+### Create order
+POST http://localhost:3000/api/orders
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Order 1",
+  "date": "2017-06-29 12:09:33",
+  "description": "Order description"
+}
+
+### Update order
+PUT http://localhost:3000/api/orders/1
+Content-Type: application/json
+
+{
+  "title": "Updated Order 1",
+  "date": "2017-07-01 12:09:33",
+  "description": "Updated order description"
+}
