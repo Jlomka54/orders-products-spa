@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  selectDeleteModalOrder,
   selectDeleteModalOrderId,
   selectOrders,
   selectOrdersError,
@@ -22,9 +23,11 @@ import OrdersList from "../../features/orders/components/OrdersList";
 import EmptyState from "../../components/ui/EmptyState";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
+import {
+  getOrderId,
+  isSameOrder,
+} from "../../utils/orderHelpers";
 import "./OrdersPage.css";
-
-const getOrderId = (order) => order.id ?? order._id;
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
@@ -34,17 +37,11 @@ const OrdersPage = () => {
   const selectedOrderId = useSelector(selectSelectedOrderId);
   const selectedOrderDetails = useSelector(selectSelectedOrderDetails);
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
+  const deleteModalOrder = useSelector(selectDeleteModalOrder);
 
-  const deleteModalOrder =
-    orders.find((order) => String(getOrderId(order)) === String(deleteModalOrderId)) ||
-    null;
-  const selectedDetailsId =
-    selectedOrderDetails === null ? null : getOrderId(selectedOrderDetails);
+  const selectedDetailsId = getOrderId(selectedOrderDetails);
   const activeSelectedOrderDetails =
-    selectedOrderDetails &&
-    (selectedDetailsId === null ||
-      selectedDetailsId === undefined ||
-      String(selectedDetailsId) === String(selectedOrderId))
+    isSameOrder(selectedDetailsId, selectedOrderId)
       ? selectedOrderDetails
       : null;
 
