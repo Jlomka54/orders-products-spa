@@ -9,12 +9,14 @@ const DeleteOrderModal = ({
     return null;
   }
 
+  const orderTitle = order?.title || "this order";
+
   return (
     <div className="orders-page__modal-backdrop">
       <div className="orders-page__modal" role="dialog" aria-modal="true">
         <h2 className="orders-page__modal-title">Delete order</h2>
         <p className="orders-page__modal-text">
-          Are you sure you want to delete {order?.title || "this order"}?
+          Are you sure you want to delete {orderTitle}?
         </p>
         <div className="orders-page__modal-actions">
           <button

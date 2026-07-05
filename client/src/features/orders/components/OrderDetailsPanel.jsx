@@ -1,20 +1,10 @@
 import { calculateOrderTotal } from "../../../utils/calculateOrderTotal";
 import { formatLongDate, formatShortDate } from "../../../utils/formatDate";
 import { formatPrice, formatProductPrices } from "../../../utils/formatPrice";
-
-const getOrderProducts = (order) => {
-  if (Array.isArray(order.products)) {
-    return order.products;
-  }
-
-  if (Array.isArray(order.items)) {
-    return order.items;
-  }
-
-  return [];
-};
-
-const getOrderDate = (order) => order.date || order.createdAt;
+import {
+  getOrderDate,
+  getOrderProducts,
+} from "../../../utils/orderHelpers";
 
 const OrderDetailsPanel = ({ selectedOrderDetails }) => {
   if (!selectedOrderDetails) {
@@ -49,7 +39,7 @@ const OrderDetailsPanel = ({ selectedOrderDetails }) => {
         </span>
       </div>
 
-      {products.length > 0 && (
+      {products.length > 0 ? (
         <ul className="orders-page__details-products">
           {products.map((product, index) => (
             <li
@@ -65,6 +55,8 @@ const OrderDetailsPanel = ({ selectedOrderDetails }) => {
             </li>
           ))}
         </ul>
+      ) : (
+        <p>No products in this order</p>
       )}
     </aside>
   );
