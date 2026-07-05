@@ -17,6 +17,19 @@
   align-items: flex-start;
 }
 
+.orders-page__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -42px 0 18px;
+}
+
+.orders-page__status .ui-loader,
+.orders-page__status .ui-error-message {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
 .orders-page__list,
 .orders-page__details-products {
   padding: 0;

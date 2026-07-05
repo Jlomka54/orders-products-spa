@@ -44,6 +44,9 @@ const OrdersPage = () => {
     isSameOrder(selectedDetailsId, selectedOrderId)
       ? selectedOrderDetails
       : null;
+  const hasOrders = orders.length > 0;
+  const isInitialLoading = isLoading && !hasOrders;
+  const hasBlockingError = error && !hasOrders;
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -70,26 +73,30 @@ const OrdersPage = () => {
     dispatch(removeOrder(deleteModalOrderId));
   };
 
-  if (isLoading && orders.length === 0) {
+  if (isInitialLoading) {
     return <Loader text="Loading orders..." />;
   }
 
-  if (error && orders.length === 0) {
+  if (hasBlockingError) {
     return <ErrorMessage message={`Failed to load orders: ${error}`} />;
   }
 
-  if (orders.length === 0) {
+  if (!hasOrders) {
     return <EmptyState message="No orders found." />;
   }
 
   return (
     <section className="orders-page">
-      {error && (
-        <ErrorMessage message={`Failed to load orders: ${error}`} />
-      )}
+      {(error || isLoading) && (
+        <div className="orders-page__status">
+          {error && (
+            <ErrorMessage message={`Failed to load orders: ${error}`} />
+          )}
 
-      {isLoading && (
-        <Loader text="Loading orders..." />
+          {isLoading && (
+            <Loader text="Loading orders..." />
+          )}
+        </div>
       )}
 
       <div className="orders-page__content">
