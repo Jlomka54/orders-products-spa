@@ -21,7 +21,7 @@ const DetailProductPhoto = ({ product }) => {
   );
 };
 
-const OrderDetailsPanel = ({ selectedOrderDetails }) => {
+const OrderDetailsPanel = ({ selectedOrderDetails, onEditOrder }) => {
   if (!selectedOrderDetails) {
     return null;
   }
@@ -38,6 +38,15 @@ const OrderDetailsPanel = ({ selectedOrderDetails }) => {
           <span aria-hidden="true">+</span>
           Добавить продукт
         </button>
+        {onEditOrder && (
+          <button
+            className="orders-page__details-edit"
+            type="button"
+            onClick={() => onEditOrder(selectedOrderDetails)}
+          >
+            Edit order
+          </button>
+        )}
       </div>
 
       {products.length > 0 ? (

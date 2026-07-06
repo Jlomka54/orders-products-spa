@@ -7,9 +7,19 @@ import {
   getProductsCount,
 } from "../../../utils/orderHelpers";
 
-const OrderItem = ({ order, isSelected, onSelect, onDelete }) => {
+const OrderItem = ({ order, isSelected, onSelect, onDelete, onEdit }) => {
   const products = getOrderProducts(order);
   const orderDate = getOrderDate(order);
+
+  const handleEditClick = (event) => {
+    event.stopPropagation();
+    onEdit(order);
+  };
+
+  const handleDeleteClick = (event) => {
+    event.stopPropagation();
+    onDelete();
+  };
 
   return (
     <div
@@ -41,10 +51,18 @@ const OrderItem = ({ order, isSelected, onSelect, onDelete }) => {
       </button>
 
       <button
+        className="orders-page__edit-button"
+        type="button"
+        onClick={handleEditClick}
+      >
+        Edit
+      </button>
+
+      <button
         className="orders-page__delete-button"
         type="button"
-        aria-label="Удалить приход"
-        onClick={onDelete}
+        aria-label="Delete order"
+        onClick={handleDeleteClick}
       />
     </div>
   );

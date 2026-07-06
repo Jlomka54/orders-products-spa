@@ -9,6 +9,7 @@ const OrdersList = ({
   selectedOrderId,
   onOrderSelect,
   onDeleteOrder,
+  onEditOrder,
 }) => {
   return (
     <ul className="orders-page__list">
@@ -28,6 +29,7 @@ const OrdersList = ({
               isSelected={isSelected}
               onSelect={() => onOrderSelect(orderId)}
               onDelete={() => onDeleteOrder(orderId)}
+              onEdit={onEditOrder}
             />
           </li>
         );
