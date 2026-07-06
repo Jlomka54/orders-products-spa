@@ -18,4 +18,9 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Only start server in local development, not on Vercel
+if (process.env.VERCEL === undefined) {
+  startServer();
+}
+
+export default app;

@@ -4,6 +4,7 @@ import EmptyState from "../../components/ui/EmptyState";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
 import ArrivalsList from "../../features/arrivals/components/ArrivalsList";
+import AddProductModal from "../../features/orders/components/AddProductModal";
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
 import {
   selectDeleteModalOrder,
@@ -12,6 +13,8 @@ import {
   selectOrdersError,
   selectOrdersLoading,
   selectOrdersMutationLoading,
+  selectSelectedOrderId,
+  selectSelectedOrderDetails,
 } from "../../features/orders/ordersSelectors";
 import {
   addProductToOrder,
@@ -20,6 +23,7 @@ import {
   openDeleteModal,
   removeProductFromOrder,
   removeOrder,
+  updateProductInOrder,
 } from "../../features/orders/ordersSlice";
 import "./OrdersPage.css";
 
@@ -31,8 +35,11 @@ const OrdersPage = () => {
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
+  const mutationLoading = useSelector(selectOrdersMutationLoading);
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
+  const selectedOrderId = useSelector(selectSelectedOrderId);
+  const activeSelectedOrderDetails = useSelector(selectSelectedOrderDetails);
   const isProductModalOpen = productModalMode !== null;
 
   const hasOrders = orders.length > 0;
@@ -102,7 +109,9 @@ const OrdersPage = () => {
         const productId = getProductRequestId(editingProduct);
 
         if (productId === null || productId === undefined) {
-          setProductActionError("Не удалось определить ID продукта для редактирования.");
+          setProductActionError(
+            "Не удалось определить ID продукта для редактирования.",
+          );
           return;
         }
 
@@ -201,7 +210,7 @@ const OrdersPage = () => {
         <AddProductModal
           key={`${productModalMode}-${getProductRequestId(editingProduct) ?? "new"}`}
           isOpen={isProductModalOpen}
-          isLoading={isLoading}
+          isLoading={mutationLoading}
           mode={productModalMode}
           orderLinkId={orderLinkId}
           orderTitle={activeSelectedOrderDetails?.title}

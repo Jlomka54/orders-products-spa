@@ -1,0 +1,37 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: orders-products-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  server:
+    build:
+      context: ./server
+    container_name: orders-products-server
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/orders-products-spa
+      JWT_SECRET: docker_secret_key
+      NODE_ENV: production
+    depends_on:
+      - mongo
+
+  client:
+    build:
+      context: ./client
+    container_name: orders-products-client
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
+
+volumes:
+  mongo-data:
