@@ -1,7 +1,5 @@
 import httpClient from "./httpClient";
-import {
-  getOrderRequestId,
-} from "../utils/orderHelpers";
+import { getOrderRequestId } from "../utils/orderHelpers";
 
 export const getOrdersApi = async () => {
   const response = await httpClient.get("/orders");
@@ -11,6 +9,18 @@ export const getOrdersApi = async () => {
 
 export const getOrderByIdApi = async (orderId) => {
   const response = await httpClient.get(`/orders/${orderId}`);
+
+  return response.data;
+};
+
+export const createOrderApi = async (orderData) => {
+  const response = await httpClient.post("/orders", orderData);
+
+  return response.data;
+};
+
+export const updateOrderApi = async (orderId, orderData) => {
+  const response = await httpClient.put(`/orders/${orderId}`, orderData);
 
   return response.data;
 };
