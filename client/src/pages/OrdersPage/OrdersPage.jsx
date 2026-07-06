@@ -21,7 +21,6 @@ import {
   closeDeleteModal,
   fetchOrders,
   openDeleteModal,
-  removeProductFromOrder,
   removeOrder,
   updateProductInOrder,
 } from "../../features/orders/ordersSlice";
@@ -71,18 +70,6 @@ const OrdersPage = () => {
     }
 
     dispatch(removeOrder(deleteModalOrderId));
-  };
-
-  const handleOpenAddProductModal = () => {
-    setProductActionError("");
-    setEditingProduct(null);
-    setProductModalMode("add");
-  };
-
-  const handleOpenEditProductModal = (product) => {
-    setProductActionError("");
-    setEditingProduct(product);
-    setProductModalMode("edit");
   };
 
   const handleCloseAddProductModal = () => {
@@ -136,38 +123,6 @@ const OrdersPage = () => {
     } catch (submitError) {
       setProductActionError(
         submitError || "Не удалось добавить продукт. Попробуйте еще раз.",
-      );
-    }
-  };
-
-  const handleDeleteProduct = async (product) => {
-    if (selectedOrderId === null || selectedOrderId === undefined) {
-      return;
-    }
-
-    const productId = getProductRequestId(product);
-
-    if (productId === null || productId === undefined) {
-      setProductActionError("Не удалось определить ID продукта для удаления.");
-      return;
-    }
-
-    if (!window.confirm(`Удалить продукт "${product.title}"?`)) {
-      return;
-    }
-
-    setProductActionError("");
-
-    try {
-      await dispatch(
-        removeProductFromOrder({
-          orderId: selectedOrderId,
-          productId,
-        }),
-      ).unwrap();
-    } catch (deleteError) {
-      setProductActionError(
-        deleteError || "Не удалось удалить продукт. Попробуйте еще раз.",
       );
     }
   };
