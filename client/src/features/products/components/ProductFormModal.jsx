@@ -20,6 +20,8 @@ const ProductFormModalContent = ({
   isLoading,
   onClose,
   onSubmit,
+  productTypes = [],
+  productSpecifications = [],
 }) => {
   const [form, setForm] = useState(() => getInitialForm(mode, product));
 
@@ -117,49 +119,72 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">URL фото</span>
-            <input
-              className="product-form-modal__input"
-              type="url"
-              name="photo"
-              value={form.photo}
-              onChange={handleChange}
-              disabled={isLoading}
-              required
-            />
-          </label>
-
-          <label className="product-form-modal__field">
             <span className="product-form-modal__label">Тип</span>
-            <input
-              className="product-form-modal__input"
-              type="text"
-              name="type"
-              value={form.type}
-              onChange={handleChange}
-              disabled={isLoading}
-              required
-            />
+            {productTypes.length > 0 ? (
+              <select
+                className="product-form-modal__input"
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                disabled={isLoading}
+                required
+              >
+                <option value="">Выберите тип</option>
+                {productTypes.map((type) => (
+                  <option value={type} key={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                className="product-form-modal__input"
+                type="text"
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                disabled={isLoading}
+                required
+              />
+            )}
           </label>
 
           <label className="product-form-modal__field">
             <span className="product-form-modal__label">Спецификация</span>
-            <input
-              className="product-form-modal__input"
-              type="text"
-              name="specification"
-              value={form.specification}
-              onChange={handleChange}
-              disabled={isLoading}
-              required
-            />
+            {productSpecifications.length > 0 ? (
+              <select
+                className="product-form-modal__input"
+                name="specification"
+                value={form.specification}
+                onChange={handleChange}
+                disabled={isLoading}
+                required
+              >
+                <option value="">Выберите спецификацию</option>
+                {productSpecifications.map((specification) => (
+                  <option value={specification} key={specification}>
+                    {specification}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                className="product-form-modal__input"
+                type="text"
+                name="specification"
+                value={form.specification}
+                onChange={handleChange}
+                disabled={isLoading}
+                required
+              />
+            )}
           </label>
 
           <label className="product-form-modal__field">
             <span className="product-form-modal__label">Гарантия с</span>
             <input
               className="product-form-modal__input"
-              type="text"
+              type="date"
               name="guaranteeStart"
               value={form.guaranteeStart}
               onChange={handleChange}
@@ -172,7 +197,7 @@ const ProductFormModalContent = ({
             <span className="product-form-modal__label">Гарантия по</span>
             <input
               className="product-form-modal__input"
-              type="text"
+              type="date"
               name="guaranteeEnd"
               value={form.guaranteeEnd}
               onChange={handleChange}
@@ -225,10 +250,10 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Дата</span>
+            <span className="product-form-modal__label">Дата поставки</span>
             <input
               className="product-form-modal__input"
-              type="text"
+              type="date"
               name="date"
               value={form.date}
               onChange={handleChange}
