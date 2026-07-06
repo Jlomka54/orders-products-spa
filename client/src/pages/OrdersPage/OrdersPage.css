@@ -114,7 +114,9 @@
 
 .orders-page__order-main {
   display: grid;
-  grid-template-columns: minmax(300px, 2fr) 92px minmax(90px, 0.7fr) minmax(130px, 1fr) minmax(118px, 0.8fr) minmax(126px, 1fr);
+  grid-template-columns:
+    minmax(300px, 2fr) 92px minmax(90px, 0.7fr) minmax(130px, 1fr)
+    minmax(118px, 0.8fr) minmax(126px, 1fr);
   gap: 16px;
   align-items: center;
   width: 100%;
@@ -247,7 +249,8 @@
   color: #ef3d58;
 }
 
-.orders-page__content:has(.orders-page__details-panel) .orders-page__order-main {
+.orders-page__content:has(.orders-page__details-panel)
+  .orders-page__order-main {
   grid-template-columns: 146px 92px 118px;
   gap: 8px;
   padding: 12px 18px 12px 38px;
@@ -256,16 +259,20 @@
 .orders-page__content:has(.orders-page__details-panel) .orders-page__title,
 .orders-page__content:has(.orders-page__details-panel) .orders-page__total-usd,
 .orders-page__content:has(.orders-page__details-panel) .orders-page__total-uah,
-.orders-page__content:has(.orders-page__details-panel) .orders-page__edit-button,
-.orders-page__content:has(.orders-page__details-panel) .orders-page__delete-button {
+.orders-page__content:has(.orders-page__details-panel)
+  .orders-page__edit-button,
+.orders-page__content:has(.orders-page__details-panel)
+  .orders-page__delete-button {
   display: none;
 }
 
-.orders-page__content:has(.orders-page__details-panel) .orders-page__order--selected {
+.orders-page__content:has(.orders-page__details-panel)
+  .orders-page__order--selected {
   padding-right: 44px;
 }
 
-.orders-page__content:has(.orders-page__details-panel) .orders-page__order--selected::after {
+.orders-page__content:has(.orders-page__details-panel)
+  .orders-page__order--selected::after {
   position: absolute;
   top: 0;
   right: 0;
@@ -298,6 +305,10 @@
 }
 
 .orders-page__details-panel::after {
+  display: none;
+}
+
+.orders-page__details-close {
   position: absolute;
   top: -23px;
   right: -23px;
@@ -305,12 +316,22 @@
   width: 44px;
   height: 44px;
   place-items: center;
+  border: 0;
   border-radius: 50%;
   color: #9aadba;
   background: #fff;
   box-shadow: 0 3px 12px rgb(53 73 84 / 22%);
+  cursor: pointer;
+}
+
+.orders-page__details-close::before {
   content: "×";
   font-size: 26px;
+  line-height: 1;
+}
+
+.orders-page__details-close:hover {
+  color: #6a8a96;
 }
 
 .orders-page__details-header {
@@ -428,7 +449,14 @@
   height: 16px;
   border: 1px solid #d6dfe4;
   background:
-    linear-gradient(90deg, #8ac142 0 30%, transparent 30% 38%, #ef3d58 38% 54%, transparent 54% 62%, #68a7c3 62% 100%),
+    linear-gradient(
+      90deg,
+      #8ac142 0 30%,
+      transparent 30% 38%,
+      #ef3d58 38% 54%,
+      transparent 54% 62%,
+      #68a7c3 62% 100%
+    ),
     #fff;
 }
 
@@ -750,13 +778,16 @@
   }
 
   .orders-page__order-main,
-  .orders-page__content:has(.orders-page__details-panel) .orders-page__order-main {
+  .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__order-main {
     grid-template-columns: minmax(220px, 2fr) 92px repeat(2, minmax(110px, 1fr));
   }
 
   .orders-page__content:has(.orders-page__details-panel) .orders-page__title,
-  .orders-page__content:has(.orders-page__details-panel) .orders-page__total-usd,
-  .orders-page__content:has(.orders-page__details-panel) .orders-page__total-uah {
+  .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__total-usd,
+  .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__total-uah {
     display: block;
   }
 }
@@ -775,7 +806,8 @@
   }
 
   .orders-page__order-main,
-  .orders-page__content:has(.orders-page__details-panel) .orders-page__order-main {
+  .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__order-main {
     grid-template-columns: 1fr 90px;
     gap: 10px;
     padding: 14px;
@@ -879,7 +911,7 @@
   gap: 10px;
   width: min(100%, 1180px);
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
   list-style: none;
 }
 
@@ -889,7 +921,9 @@
 
 .arrival-item {
   display: grid;
-  grid-template-columns: minmax(220px, 1.8fr) minmax(118px, 0.8fr) minmax(150px, 0.95fr) minmax(138px, 0.8fr) 44px;
+  grid-template-columns:
+    minmax(220px, 1.8fr) minmax(118px, 0.8fr) minmax(150px, 0.95fr)
+    minmax(138px, 0.8fr) 44px;
   gap: 22px;
   align-items: center;
   min-height: 72px;
@@ -956,7 +990,9 @@
   width: 2px;
   height: 2px;
   left: 12px;
-  box-shadow: 0 6px 0 currentColor, 0 12px 0 currentColor;
+  box-shadow:
+    0 6px 0 currentColor,
+    0 12px 0 currentColor;
 }
 
 .arrival-item__products-count {
@@ -979,21 +1015,35 @@
   gap: 4px;
 }
 
-.arrival-item__date-short,
-.arrival-item__price--usd {
+.arrival-item__date-short {
   color: var(--color-muted);
   font-size: 12px;
   line-height: 1.2;
 }
 
-.arrival-item__date-long,
-.arrival-item__price--uah {
+.arrival-item__date-long {
   overflow: hidden;
   color: #4d6879;
   font-size: 16px;
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.arrival-item__prices {
+  align-items: flex-end;
+}
+
+.arrival-item__price--usd {
+  color: #243540;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.arrival-item__price--uah {
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.25;
 }
 
 .arrival-item__delete {

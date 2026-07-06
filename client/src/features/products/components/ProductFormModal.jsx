@@ -7,14 +7,20 @@ import {
 } from "../../../utils/productHelpers";
 
 const getInitialForm = (mode, product) => {
-  if (mode === "edit" && product) {
+  if (product) {
     return createProductFormFromProduct(product);
   }
 
   return createEmptyProductForm();
 };
 
-const ProductFormModalContent = ({ mode, product, isLoading, onClose, onSubmit }) => {
+const ProductFormModalContent = ({
+  mode,
+  product,
+  isLoading,
+  onClose,
+  onSubmit,
+}) => {
   const [form, setForm] = useState(() => getInitialForm(mode, product));
 
   const isEditMode = mode === "edit";
@@ -44,7 +50,10 @@ const ProductFormModalContent = ({ mode, product, isLoading, onClose, onSubmit }
         aria-labelledby="product-form-modal-title"
       >
         <div className="product-form-modal__header">
-          <h2 className="product-form-modal__title" id="product-form-modal-title">
+          <h2
+            className="product-form-modal__title"
+            id="product-form-modal-title"
+          >
             {title}
           </h2>
           <button

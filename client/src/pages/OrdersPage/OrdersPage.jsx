@@ -5,13 +5,9 @@ import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
 import ArrivalsList from "../../features/arrivals/components/ArrivalsList";
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
-import OrderFormModal from "../../features/orders/components/OrderFormModal";
 import {
   selectDeleteModalOrder,
   selectDeleteModalOrderId,
-  selectEditingOrder,
-  selectOrderFormMode,
-  selectOrderFormOpen,
   selectOrders,
   selectOrdersError,
   selectOrdersLoading,
@@ -19,10 +15,7 @@ import {
 } from "../../features/orders/ordersSelectors";
 import {
   closeDeleteModal,
-  closeOrderFormModal,
-  createOrder,
   fetchOrders,
-  openCreateOrderModal,
   openDeleteModal,
   removeOrder,
 } from "../../features/orders/ordersSlice";
@@ -35,10 +28,6 @@ const OrdersPage = () => {
   const error = useSelector(selectOrdersError);
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
-  const isOrderFormOpen = useSelector(selectOrderFormOpen);
-  const orderFormMode = useSelector(selectOrderFormMode);
-  const editingOrder = useSelector(selectEditingOrder);
-  const mutationLoading = useSelector(selectOrdersMutationLoading);
 
   const hasOrders = orders.length > 0;
   const isInitialLoading = isLoading && !hasOrders;
@@ -50,18 +39,6 @@ const OrdersPage = () => {
 
   const handleOpenDeleteModal = (orderId) => {
     dispatch(openDeleteModal(orderId));
-  };
-
-  const handleOpenCreateOrderModal = () => {
-    dispatch(openCreateOrderModal());
-  };
-
-  const handleCloseOrderFormModal = () => {
-    dispatch(closeOrderFormModal());
-  };
-
-  const handleOrderSubmit = (payload) => {
-    dispatch(createOrder(payload));
   };
 
   const handleCloseDeleteModal = () => {
@@ -87,14 +64,6 @@ const OrdersPage = () => {
   return (
     <section className="orders-page orders-page--arrivals">
       <header className="orders-page__header">
-        <button
-          className="orders-page__add-button"
-          type="button"
-          aria-label="Add arrival"
-          onClick={handleOpenCreateOrderModal}
-        >
-          +
-        </button>
         <h1 className="orders-page__heading">Приходы / {orders.length}</h1>
       </header>
 
@@ -104,29 +73,15 @@ const OrdersPage = () => {
             <ErrorMessage message={`Failed to load orders: ${error}`} />
           )}
 
-          {isLoading && (
-            <Loader text="Loading orders..." />
-          )}
+          {isLoading && <Loader text="Loading orders..." />}
         </div>
       )}
 
       {hasOrders ? (
-        <ArrivalsList
-          orders={orders}
-          onDeleteOrder={handleOpenDeleteModal}
-        />
+        <ArrivalsList orders={orders} onDeleteOrder={handleOpenDeleteModal} />
       ) : (
         <EmptyState message="No orders found." />
       )}
-
-      <OrderFormModal
-        isOpen={isOrderFormOpen}
-        mode={orderFormMode}
-        order={editingOrder}
-        isLoading={mutationLoading}
-        onClose={handleCloseOrderFormModal}
-        onSubmit={handleOrderSubmit}
-      />
 
       <DeleteOrderModal
         deleteModalOrderId={deleteModalOrderId}

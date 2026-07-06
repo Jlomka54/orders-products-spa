@@ -18,7 +18,13 @@ export const formatPrice = (value, symbol = "") => {
   const formattedValue = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
     minimumFractionDigits: Number.isInteger(numericValue) ? 0 : 2,
-  }).format(numericValue);
+  })
+    .format(numericValue)
+    .replace(/,/g, " ");
+
+  if (symbol === "USD") {
+    return `${formattedValue} $`;
+  }
 
   return [formattedValue, symbol].filter(Boolean).join(" ");
 };
@@ -29,9 +35,10 @@ export const formatProductPrices = (priceArray) => {
   }
 
   return [...priceArray]
-    .sort((firstPrice, secondPrice) =>
-      Number(Boolean(secondPrice?.isDefault)) -
-      Number(Boolean(firstPrice?.isDefault)),
+    .sort(
+      (firstPrice, secondPrice) =>
+        Number(Boolean(secondPrice?.isDefault)) -
+        Number(Boolean(firstPrice?.isDefault)),
     )
     .map((price) => formatPrice(price?.value, price?.symbol))
     .filter(Boolean)

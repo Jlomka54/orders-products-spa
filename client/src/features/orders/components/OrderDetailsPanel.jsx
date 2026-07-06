@@ -21,7 +21,12 @@ const DetailProductPhoto = ({ product }) => {
   );
 };
 
-const OrderDetailsPanel = ({ selectedOrderDetails, onEditOrder }) => {
+const OrderDetailsPanel = ({
+  selectedOrderDetails,
+  onEditOrder,
+  onAddProduct,
+  onClose,
+}) => {
   if (!selectedOrderDetails) {
     return null;
   }
@@ -30,11 +35,21 @@ const OrderDetailsPanel = ({ selectedOrderDetails, onEditOrder }) => {
 
   return (
     <aside className="orders-page__details-panel orders-page__details-panel--visible">
+      <button
+        className="orders-page__details-close"
+        type="button"
+        aria-label="Close details"
+        onClick={onClose}
+      />
       <div className="orders-page__details-header">
         <h2 className="orders-page__details-title">
           {selectedOrderDetails.title}
         </h2>
-        <button className="orders-page__details-add" type="button">
+        <button
+          className="orders-page__details-add"
+          type="button"
+          onClick={onAddProduct}
+        >
           <span aria-hidden="true">+</span>
           Добавить продукт
         </button>
@@ -77,7 +92,9 @@ const OrderDetailsPanel = ({ selectedOrderDetails, onEditOrder }) => {
           ))}
         </ul>
       ) : (
-        <p className="orders-page__details-empty">В этом приходе нет продуктов</p>
+        <p className="orders-page__details-empty">
+          В этом приходе нет продуктов
+        </p>
       )}
     </aside>
   );

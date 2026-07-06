@@ -15,11 +15,10 @@ export const formatShortDate = (date) => {
     return "";
   }
 
-  return parsedDate.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+
+  return `${day} / ${month}`;
 };
 
 export const formatLongDate = (date) => {
@@ -29,9 +28,11 @@ export const formatLongDate = (date) => {
     return "";
   }
 
-  return parsedDate.toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  const month = parsedDate
+    .toLocaleString("en-US", { month: "short" })
+    .replace(".", "");
+  const year = parsedDate.getFullYear();
+
+  return `${day} / ${month} / ${year}`;
 };

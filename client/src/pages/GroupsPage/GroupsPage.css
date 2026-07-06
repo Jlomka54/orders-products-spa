@@ -64,7 +64,9 @@
   min-width: 360px;
 }
 
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__list {
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__list {
   flex: 0 0 468px;
 }
 
@@ -99,7 +101,10 @@
 
 .groups-page .orders-page__order-main {
   display: grid;
-  grid-template-columns: minmax(300px, 2fr) 92px minmax(90px, 0.7fr) minmax(130px, 1fr) minmax(118px, 0.8fr) minmax(126px, 1fr);
+  grid-template-columns: minmax(300px, 2fr) 92px minmax(90px, 0.7fr) minmax(
+      130px,
+      1fr
+    ) minmax(118px, 0.8fr) minmax(126px, 1fr);
   gap: 16px;
   align-items: center;
   width: 100%;
@@ -228,25 +233,41 @@
   color: #ef3d58;
 }
 
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__order-main {
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__order-main {
   grid-template-columns: 146px 92px 118px;
   gap: 8px;
   padding: 12px 18px 12px 38px;
 }
 
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__title,
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__total-usd,
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__total-uah,
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__edit-button,
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__delete-button {
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__title,
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__total-usd,
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__total-uah,
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__edit-button,
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__delete-button {
   display: none;
 }
 
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__order--selected {
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__order--selected {
   padding-right: 44px;
 }
 
-.groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__order--selected::after {
+.groups-page
+  .orders-page__content:has(.orders-page__details-panel)
+  .orders-page__order--selected::after {
   position: absolute;
   top: 0;
   right: 0;
@@ -292,6 +313,7 @@
   box-shadow: 0 3px 12px rgb(53 73 84 / 22%);
   content: "×";
   font-size: 26px;
+  pointer-events: none;
 }
 
 .groups-page .orders-page__details-header {
@@ -409,7 +431,14 @@
   height: 16px;
   border: 1px solid #d6dfe4;
   background:
-    linear-gradient(90deg, #8ac142 0 30%, transparent 30% 38%, #ef3d58 38% 54%, transparent 54% 62%, #68a7c3 62% 100%),
+    linear-gradient(
+      90deg,
+      #8ac142 0 30%,
+      transparent 30% 38%,
+      #ef3d58 38% 54%,
+      transparent 54% 62%,
+      #68a7c3 62% 100%
+    ),
     #fff;
 }
 
@@ -479,6 +508,7 @@
   background: #fff;
   box-shadow: 0 3px 12px rgb(53 73 84 / 22%);
   cursor: pointer;
+  z-index: 1;
 }
 
 .groups-page .orders-page__modal-close::before {
@@ -717,20 +747,30 @@
 
   .groups-page .orders-page__list,
   .groups-page .orders-page__details-panel,
-  .groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__list {
+  .groups-page
+    .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__list {
     width: 100%;
     min-width: 0;
     flex-basis: auto;
   }
 
   .groups-page .orders-page__order-main,
-  .groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__order-main {
+  .groups-page
+    .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__order-main {
     grid-template-columns: minmax(220px, 2fr) 92px repeat(2, minmax(110px, 1fr));
   }
 
-  .groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__title,
-  .groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__total-usd,
-  .groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__total-uah {
+  .groups-page
+    .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__title,
+  .groups-page
+    .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__total-usd,
+  .groups-page
+    .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__total-uah {
     display: block;
   }
 }
@@ -749,7 +789,9 @@
   }
 
   .groups-page .orders-page__order-main,
-  .groups-page .orders-page__content:has(.orders-page__details-panel) .orders-page__order-main {
+  .groups-page
+    .orders-page__content:has(.orders-page__details-panel)
+    .orders-page__order-main {
     grid-template-columns: 1fr 90px;
     gap: 10px;
     padding: 14px;

@@ -6,12 +6,11 @@ import Loader from "../../components/ui/Loader";
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
 import OrderDetailsPanel from "../../features/orders/components/OrderDetailsPanel";
 import OrderFormModal from "../../features/orders/components/OrderFormModal";
+import ProductFormModal from "../../features/products/components/ProductFormModal";
 import OrdersList from "../../features/orders/components/OrdersList";
 import {
   selectDeleteModalOrder,
   selectDeleteModalOrderId,
-  selectEditingOrder,
-  selectOrderFormMode,
   selectOrderFormOpen,
   selectOrders,
   selectOrdersError,
@@ -21,6 +20,7 @@ import {
   selectSelectedOrderDetails,
 } from "../../features/orders/ordersSelectors";
 import {
+  clearSelectedOrder,
   closeDeleteModal,
   closeOrderFormModal,
   createOrder,
@@ -28,11 +28,18 @@ import {
   fetchOrders,
   openCreateOrderModal,
   openDeleteModal,
-  openEditOrderModal,
   removeOrder,
   setSelectedOrderId,
-  updateOrder,
 } from "../../features/orders/ordersSlice";
+import {
+  selectProductFormOpen,
+  selectProductsMutationLoading,
+} from "../../features/products/productsSelectors";
+import {
+  closeProductFormModal,
+  createProduct,
+  openCreateProductModal,
+} from "../../features/products/productsSlice";
 import {
   getOrderId,
   getOrderRequestId,
@@ -50,15 +57,17 @@ const GroupsPage = () => {
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
   const isOrderFormOpen = useSelector(selectOrderFormOpen);
-  const orderFormMode = useSelector(selectOrderFormMode);
-  const editingOrder = useSelector(selectEditingOrder);
+  const isProductFormOpen = useSelector(selectProductFormOpen);
   const mutationLoading = useSelector(selectOrdersMutationLoading);
+  const productMutationLoading = useSelector(selectProductsMutationLoading);
 
   const selectedDetailsId = getOrderId(selectedOrderDetails);
-  const activeSelectedOrderDetails =
-    isSameOrder(selectedDetailsId, selectedOrderId)
-      ? selectedOrderDetails
-      : null;
+  const activeSelectedOrderDetails = isSameOrder(
+    selectedDetailsId,
+    selectedOrderId,
+  )
+    ? selectedOrderDetails
+    : null;
   const hasOrders = orders.length > 0;
   const isInitialLoading = isLoading && !hasOrders;
   const hasBlockingError = error && !hasOrders;
@@ -72,12 +81,12 @@ const GroupsPage = () => {
     dispatch(fetchOrderById(orderId));
   };
 
-  const handleOpenCreateOrderModal = () => {
-    dispatch(openCreateOrderModal());
+  const handleCloseDetailsPanel = () => {
+    dispatch(clearSelectedOrder());
   };
 
-  const handleOpenEditOrderModal = (order) => {
-    dispatch(openEditOrderModal(order));
+  const handleOpenCreateOrderModal = () => {
+    dispatch(openCreateOrderModal());
   };
 
   const handleCloseOrderFormModal = () => {
@@ -85,24 +94,37 @@ const GroupsPage = () => {
   };
 
   const handleOrderSubmit = (payload) => {
-    if (orderFormMode === "create") {
-      dispatch(createOrder(payload));
-      return;
-    }
+    const groupOrderPayload = {
+      title: payload.name,
+      date: new Date().toISOString(),
+      description: payload.description,
+    };
 
-    const orderId = getOrderRequestId(editingOrder);
-
-    if (orderId !== null && orderId !== undefined) {
-      dispatch(updateOrder({ orderId, orderPayload: payload }));
-    }
+    dispatch(createOrder(groupOrderPayload));
   };
 
   const handleOpenDeleteModal = (orderId) => {
     dispatch(openDeleteModal(orderId));
   };
 
+  const handleOpenCreateProductModal = () => {
+    dispatch(openCreateProductModal());
+  };
+
   const handleCloseDeleteModal = () => {
     dispatch(closeDeleteModal());
+  };
+
+  const handleCloseProductFormModal = () => {
+    dispatch(closeProductFormModal());
+  };
+
+  const handleProductSubmit = (payload) => {
+    const productPayload = selectedOrderId
+      ? { ...payload, order: Number(selectedOrderId) }
+      : payload;
+
+    dispatch(createProduct(productPayload));
   };
 
   const handleConfirmDelete = () => {
@@ -127,10 +149,10 @@ const GroupsPage = () => {
         <button
           className="orders-page__create-button"
           type="button"
-          aria-label="Add order"
+          aria-label="Create group"
           onClick={handleOpenCreateOrderModal}
         >
-          + Add order
+          + Create group
         </button>
         <h1 className="orders-page__heading">Группы / {orders.length}</h1>
       </header>
@@ -141,9 +163,7 @@ const GroupsPage = () => {
             <ErrorMessage message={`Failed to load orders: ${error}`} />
           )}
 
-          {isLoading && (
-            <Loader text="Loading orders..." />
-          )}
+          {isLoading && <Loader text="Loading orders..." />}
         </div>
       )}
 
@@ -154,12 +174,12 @@ const GroupsPage = () => {
             selectedOrderId={selectedOrderId}
             onOrderSelect={handleOrderClick}
             onDeleteOrder={handleOpenDeleteModal}
-            onEditOrder={handleOpenEditOrderModal}
           />
 
           <OrderDetailsPanel
             selectedOrderDetails={activeSelectedOrderDetails}
-            onEditOrder={handleOpenEditOrderModal}
+            onAddProduct={handleOpenCreateProductModal}
+            onClose={handleCloseDetailsPanel}
           />
         </div>
       ) : (
@@ -168,11 +188,22 @@ const GroupsPage = () => {
 
       <OrderFormModal
         isOpen={isOrderFormOpen}
-        mode={orderFormMode}
-        order={editingOrder}
         isLoading={mutationLoading}
         onClose={handleCloseOrderFormModal}
         onSubmit={handleOrderSubmit}
+      />
+
+      <ProductFormModal
+        isOpen={isProductFormOpen}
+        mode="create"
+        product={
+          selectedOrderId
+            ? { order: Number(selectedOrderId), date: new Date().toISOString() }
+            : undefined
+        }
+        isLoading={productMutationLoading}
+        onClose={handleCloseProductFormModal}
+        onSubmit={handleProductSubmit}
       />
 
       <DeleteOrderModal

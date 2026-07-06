@@ -1,24 +1,14 @@
 import { useState } from "react";
-import {
-  buildOrderPayload,
-  createEmptyOrderForm,
-  createOrderFormFromOrder,
-  getOrderId,
-} from "../../../utils/orderHelpers";
 
-const getInitialForm = (mode, order) => {
-  if (mode === "edit" && order) {
-    return createOrderFormFromOrder(order);
-  }
+const createEmptyGroupForm = () => ({
+  name: "",
+  description: "",
+});
 
-  return createEmptyOrderForm();
-};
-
-const OrderFormModalContent = ({ mode, order, isLoading, onClose, onSubmit }) => {
-  const [form, setForm] = useState(() => getInitialForm(mode, order));
-  const isEditMode = mode === "edit";
-  const title = isEditMode ? "Edit order" : "Create order";
-  const submitText = isEditMode ? "Save order" : "Create order";
+const OrderFormModalContent = ({ isLoading, onClose, onSubmit }) => {
+  const [form, setForm] = useState(() => createEmptyGroupForm());
+  const title = "Create group";
+  const submitText = "Create group";
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -31,7 +21,10 @@ const OrderFormModalContent = ({ mode, order, isLoading, onClose, onSubmit }) =>
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    onSubmit(buildOrderPayload(form));
+    onSubmit({
+      name: form.name,
+      description: form.description,
+    });
   };
 
   return (
@@ -57,37 +50,12 @@ const OrderFormModalContent = ({ mode, order, isLoading, onClose, onSubmit }) =>
 
         <form className="order-form-modal__form" onSubmit={handleSubmit}>
           <label className="order-form-modal__field">
-            <span className="order-form-modal__label">Legacy ID</span>
-            <input
-              className="order-form-modal__input"
-              type="number"
-              name="legacyId"
-              value={form.legacyId}
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-          </label>
-
-          <label className="order-form-modal__field">
-            <span className="order-form-modal__label">Title</span>
+            <span className="order-form-modal__label">Group name</span>
             <input
               className="order-form-modal__input"
               type="text"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              disabled={isLoading}
-              required
-            />
-          </label>
-
-          <label className="order-form-modal__field">
-            <span className="order-form-modal__label">Date</span>
-            <input
-              className="order-form-modal__input"
-              type="text"
-              name="date"
-              value={form.date}
+              name="name"
+              value={form.name}
               onChange={handleChange}
               disabled={isLoading}
               required
@@ -129,25 +97,13 @@ const OrderFormModalContent = ({ mode, order, isLoading, onClose, onSubmit }) =>
   );
 };
 
-const OrderFormModal = ({
-  isOpen,
-  mode,
-  order,
-  isLoading,
-  onClose,
-  onSubmit,
-}) => {
+const OrderFormModal = ({ isOpen, isLoading, onClose, onSubmit }) => {
   if (!isOpen) {
     return null;
   }
 
-  const orderKey = getOrderId(order) ?? "new";
-
   return (
     <OrderFormModalContent
-      key={`${mode}-${orderKey}`}
-      mode={mode}
-      order={order}
       isLoading={isLoading}
       onClose={onClose}
       onSubmit={onSubmit}
