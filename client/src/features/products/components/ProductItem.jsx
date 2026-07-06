@@ -2,6 +2,7 @@ import { useState } from "react";
 import StatusBadge from "../../../components/ui/StatusBadge";
 import { formatLongDate, formatShortDate } from "../../../utils/formatDate";
 import { formatPrice } from "../../../utils/formatPrice";
+import { getProductRequestId } from "../../../utils/productHelpers";
 
 const findPrice = (prices, symbol) => {
   if (!Array.isArray(prices)) {
@@ -27,11 +28,12 @@ const getOrderTitle = (product) => {
   return String(product.order);
 };
 
-const ProductItem = ({ product }) => {
+const ProductItem = ({ product, onEdit, onDelete }) => {
   const [hasImageError, setHasImageError] = useState(false);
   const usdPrice = findPrice(product.price, "USD");
   const uahPrice = findPrice(product.price, "UAH");
   const shouldShowImage = product.photo && !hasImageError;
+  const productId = getProductRequestId(product);
 
   return (
     <article className="products-page__product">
@@ -96,9 +98,18 @@ const ProductItem = ({ product }) => {
       </span>
 
       <button
+        className="products-page__edit-button"
+        type="button"
+        onClick={() => onEdit(product)}
+      >
+        Edit
+      </button>
+
+      <button
         className="products-page__delete-button"
         type="button"
-        aria-label="Удалить продукт"
+        aria-label="Delete product"
+        onClick={() => onDelete(productId)}
       />
     </article>
   );
