@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  createOrderApi,
   deleteOrderApi,
   getOrderByIdApi,
   getOrdersWithDetailsApi,
+  updateOrderApi,
 } from "../../api/ordersApi";
 import {
   getOrderId,
@@ -32,6 +34,35 @@ export const fetchOrderById = createAsyncThunk(
   },
 );
 
+export const createOrder = createAsyncThunk(
+  "orders/createOrder",
+  async (orderPayload, { rejectWithValue }) => {
+    try {
+      const response = await createOrderApi(orderPayload);
+
+      return response.order || response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const updateOrder = createAsyncThunk(
+  "orders/updateOrder",
+  async ({ orderId, orderPayload }, { rejectWithValue }) => {
+    try {
+      const response = await updateOrderApi(orderId, orderPayload);
+
+      return {
+        orderId,
+        order: response.order || response,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
 export const removeOrder = createAsyncThunk(
   "orders/removeOrder",
   async (orderId, { rejectWithValue }) => {
@@ -53,7 +84,11 @@ const initialState = {
   selectedOrderId: null,
   selectedOrderDetails: null,
   deleteModalOrderId: null,
+  isOrderFormOpen: false,
+  orderFormMode: "create",
+  editingOrder: null,
   isLoading: false,
+  mutationLoading: false,
   error: null,
 };
 
@@ -64,6 +99,16 @@ const setPendingState = (state) => {
 
 const setRejectedState = (state, action) => {
   state.isLoading = false;
+  state.error = action.payload || action.error.message || "Orders request failed";
+};
+
+const setMutationPendingState = (state) => {
+  state.mutationLoading = true;
+  state.error = null;
+};
+
+const setMutationRejectedState = (state, action) => {
+  state.mutationLoading = false;
   state.error = action.payload || action.error.message || "Orders request failed";
 };
 
@@ -83,6 +128,20 @@ const ordersSlice = createSlice({
     },
     closeDeleteModal: (state) => {
       state.deleteModalOrderId = null;
+    },
+    openCreateOrderModal: (state) => {
+      state.isOrderFormOpen = true;
+      state.orderFormMode = "create";
+      state.editingOrder = null;
+    },
+    openEditOrderModal: (state, action) => {
+      state.isOrderFormOpen = true;
+      state.orderFormMode = "edit";
+      state.editingOrder = action.payload;
+    },
+    closeOrderFormModal: (state) => {
+      state.isOrderFormOpen = false;
+      state.editingOrder = null;
     },
   },
   extraReducers: (builder) => {
@@ -122,7 +181,42 @@ const ordersSlice = createSlice({
           state.selectedOrderDetails = null;
         }
       })
-      .addCase(removeOrder.rejected, setRejectedState);
+      .addCase(removeOrder.rejected, setRejectedState)
+      .addCase(createOrder.pending, setMutationPendingState)
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.items.push(normalizeOrder(action.payload));
+        state.isOrderFormOpen = false;
+        state.editingOrder = null;
+        state.mutationLoading = false;
+        state.error = null;
+      })
+      .addCase(createOrder.rejected, setMutationRejectedState)
+      .addCase(updateOrder.pending, setMutationPendingState)
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        const updatedOrderId = action.payload.orderId;
+        const updatedOrder = normalizeOrder(action.payload.order);
+
+        state.items = state.items.map((order) =>
+          isSameOrder(getOrderId(order), updatedOrderId)
+            ? updatedOrder
+            : order,
+        );
+
+        if (
+          isSameOrder(
+            getOrderId(state.selectedOrderDetails),
+            updatedOrderId,
+          )
+        ) {
+          state.selectedOrderDetails = updatedOrder;
+        }
+
+        state.isOrderFormOpen = false;
+        state.editingOrder = null;
+        state.mutationLoading = false;
+        state.error = null;
+      })
+      .addCase(updateOrder.rejected, setMutationRejectedState);
   },
 });
 
@@ -131,6 +225,9 @@ export const {
   clearSelectedOrder,
   openDeleteModal,
   closeDeleteModal,
+  openCreateOrderModal,
+  openEditOrderModal,
+  closeOrderFormModal,
 } = ordersSlice.actions;
 
 export default ordersSlice.reducer;
