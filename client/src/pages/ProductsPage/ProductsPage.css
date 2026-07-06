@@ -247,6 +247,9 @@
   color: #92a7b3;
   background: transparent;
   cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .products-page__delete-button svg {
@@ -474,7 +477,7 @@
   }
 
   .products-page__product {
-    grid-template-columns: 10px 48px minmax(0, 1fr) 34px;
+    grid-template-columns: 10px 48px minmax(0, 1fr);
     padding: 12px;
   }
 
@@ -488,8 +491,13 @@
   .products-page__guarantee,
   .products-page__prices,
   .products-page__order-title,
-  .products-page__date {
-    grid-column: 3 / -2;
+  .products-page__date,
+  .products-page__actions {
+    grid-column: 3 / -1;
+  }
+
+  .products-page__actions {
+    justify-content: flex-start;
   }
 
   .products-page__edit-button {

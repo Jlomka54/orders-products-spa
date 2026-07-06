@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../../components/ui/EmptyState";
 import ErrorMessage from "../../components/ui/ErrorMessage";
@@ -41,6 +41,8 @@ import "./ProductsPage.css";
 
 export const ProductsPage = () => {
   const dispatch = useDispatch();
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productActionError, setProductActionError] = useState("");
   const products = useSelector(selectProducts);
   const filteredProducts = useSelector(selectFilteredProducts);
   const isLoading = useSelector(selectProductsLoading);
