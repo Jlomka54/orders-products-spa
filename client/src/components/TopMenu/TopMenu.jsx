@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { logout } from "../../features/auth/authSlice";
 import "./TopMenu.css";
 
@@ -21,6 +22,7 @@ const formatTime = (date) =>
 
 const TopMenu = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const activeSessions = useSelector((state) => state.ui.activeSessions);
   const [currentDate, setCurrentDate] = useState(() => new Date());
 
@@ -33,6 +35,11 @@ const TopMenu = () => {
       window.clearInterval(intervalId);
     };
   }, []);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="top-menu">
@@ -54,7 +61,7 @@ const TopMenu = () => {
           <button
             className="top-menu__logout"
             type="button"
-            onClick={() => dispatch(logout())}
+            onClick={handleLogout}
           >
             Выход
           </button>

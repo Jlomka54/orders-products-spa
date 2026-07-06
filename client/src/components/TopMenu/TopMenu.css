@@ -124,9 +124,12 @@
   content: "";
 }
 
-.top-menu__sessions,
-.top-menu__logout-item {
+.top-menu__sessions {
   display: none;
+}
+
+.top-menu__logout-item {
+  display: block;
 }
 
 .top-menu__logout {
@@ -139,6 +142,15 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.top-menu__logout:hover {
+  background: #b9231b;
+}
+
+.top-menu__logout:focus-visible {
+  outline: 3px solid rgb(217 48 37 / 24%);
+  outline-offset: 2px;
 }
 
 @media (max-width: 1280px) {
