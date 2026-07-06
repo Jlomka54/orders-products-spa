@@ -20,6 +20,28 @@ const fallbackStatusMessages = {
 };
 
 const serverMessageTranslations = {
+  "Enter your name and password to continue":
+    "Введите имя и пароль, чтобы продолжить.",
+  "Enter your name to continue": "Введите имя, чтобы продолжить.",
+  "Enter your password to continue": "Введите пароль, чтобы продолжить.",
+  "Password must be at least 6 characters":
+    "Пароль должен быть не менее 6 символов.",
+  "This name is already in use. Try another one":
+    "Это имя уже занято. Попробуйте другое.",
+  "We couldn't find an account with this name":
+    "Аккаунт с таким именем не найден.",
+  "Incorrect password. Please try again":
+    "Неверный пароль. Попробуйте еще раз.",
+  "Authentication is temporarily unavailable. Please try again later":
+    "Авторизация временно недоступна. Попробуйте позже.",
+  "We couldn't create your account right now. Please try again later":
+    "Не удалось создать аккаунт. Попробуйте позже.",
+  "We couldn't sign you in right now. Please try again later":
+    "Не удалось войти в аккаунт. Попробуйте позже.",
+  "Your account was not found. Please sign in again":
+    "Аккаунт не найден. Войдите еще раз.",
+  "Your session could not be verified. Please sign in again":
+    "Не удалось проверить сессию. Войдите еще раз.",
   "Required product fields are missing":
     "Заполните все обязательные поля продукта.",
   "Guarantee start and end dates are required": "Укажите обе даты гарантии.",
@@ -59,8 +81,16 @@ const translateServerMessage = (message) => {
 const getResponseMessage = (error) => {
   const status = error.response?.status;
   const responseData = error.response?.data;
+  const requestUrl = error.config?.url ?? "";
   const serverMessage =
     typeof responseData === "string" ? "" : responseData?.message;
+
+  if (status === 401 && requestUrl.includes("/auth/login")) {
+    return (
+      translateServerMessage(serverMessage) ||
+      "Неверный пароль. Попробуйте еще раз."
+    );
+  }
 
   if (status === 502) {
     return fallbackStatusMessages[502];

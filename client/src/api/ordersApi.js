@@ -1,5 +1,5 @@
 import httpClient from "./httpClient";
-import { getOrderRequestId } from "../utils/orderHelpers";
+import { getOrderId } from "../utils/orderHelpers";
 
 export const getOrdersApi = async () => {
   const response = await httpClient.get("/orders");
@@ -40,7 +40,7 @@ export const getOrdersWithDetailsApi = async () => {
 
   return Promise.all(
     orders.map(async (order) => {
-      const orderId = getOrderRequestId(order);
+      const orderId = getOrderId(order);
 
       if (orderId === null || orderId === undefined) {
         return order;

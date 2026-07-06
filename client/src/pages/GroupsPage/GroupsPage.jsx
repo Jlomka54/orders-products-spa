@@ -44,7 +44,6 @@ import {
 } from "../../features/products/productsSlice";
 import {
   getOrderId,
-  getOrderRequestId,
   isSameOrder,
 } from "../../utils/orderHelpers";
 import "./GroupsPage.css";
