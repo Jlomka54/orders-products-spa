@@ -29,12 +29,12 @@ const LoginPage = () => {
     const trimmedUsername = username.trim();
 
     if (!trimmedUsername) {
-      setFormError("Name is required");
+      setFormError("Имя обязательно");
       return;
     }
 
     if (!password) {
-      setFormError("Password is required");
+      setFormError("Пароль обязателен");
       return;
     }
 
@@ -56,10 +56,10 @@ const LoginPage = () => {
   return (
     <section className="login-page">
       <form className="login-page__form" onSubmit={handleSubmit}>
-        <h1 className="login-page__title">Login</h1>
+        <h1 className="login-page__title">Авторизация</h1>
 
         <label className="login-page__field">
-          <span className="login-page__label">Name</span>
+          <span className="login-page__label">Имя</span>
           <input
             className="login-page__input"
             type="text"
@@ -70,7 +70,7 @@ const LoginPage = () => {
         </label>
 
         <label className="login-page__field">
-          <span className="login-page__label">Password</span>
+          <span className="login-page__label">Пароль</span>
           <input
             className="login-page__input"
             type="password"
@@ -89,11 +89,11 @@ const LoginPage = () => {
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? "Logging in..." : "Login"}
+          {isLoading ? "Вход..." : "Войти"}
         </button>
 
         <p className="login-page__hint">
-          No account? <Link to="/register">Register</Link>
+          Нет аккаунта? <Link to="/register">Регистрация</Link>
         </p>
       </form>
     </section>

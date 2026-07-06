@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import GroupsPage from "../pages/GroupsPage/GroupsPage";
 import OrdersPage from "../pages/OrdersPage/OrdersPage";
 import { ProductsPage } from "../pages/ProductsPage/ProductsPage";
 import { NotFoundPage } from "../pages/NotFoundPage/NotFoundPage";
@@ -27,6 +28,7 @@ const AppRouter = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/groups" element={<GroupsPage />} />
             <Route path="/products" element={<ProductsPage />} />
           </Route>
         </Route>

@@ -38,7 +38,7 @@ const TopMenu = () => {
     <header className="top-menu">
       <div className="top-menu__brand">
         <span className="top-menu__logo" aria-hidden="true" />
-        <span className="top-menu__brand-text">INVENTORY</span>
+        <span className="top-menu__brand-text">ИНВЕНТАРЬ</span>
       </div>
 
       <label className="top-menu__search">
@@ -59,7 +59,7 @@ const TopMenu = () => {
             Выход
           </button>
         </li>
-        <li className="top-menu__sessions">Sessions: {activeSessions}</li>
+        <li className="top-menu__sessions">Сессий: {activeSessions}</li>
       </ul>
     </header>
   );

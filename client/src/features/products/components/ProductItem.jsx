@@ -53,7 +53,9 @@ const ProductItem = ({ product, onEdit, onDelete }) => {
             onError={() => setHasImageError(true)}
           />
         ) : (
-          <span className="products-page__image-placeholder">No image</span>
+          <span className="products-page__image-placeholder">
+            Нет изображения
+          </span>
         )}
       </div>
 
@@ -102,15 +104,56 @@ const ProductItem = ({ product, onEdit, onDelete }) => {
         type="button"
         onClick={() => onEdit(product)}
       >
-        Edit
+        Изменить
       </button>
 
       <button
         className="products-page__delete-button"
         type="button"
-        aria-label="Delete product"
+        aria-label="Удалить продукт"
         onClick={() => onDelete(productId)}
-      />
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M3 6H5H21"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M19 6L18.1569 19.1195C18.1096 19.6608 17.6262 20.0773 17.0836 20.0773H6.91638C6.37377 20.0773 5.89039 19.6608 5.84309 19.1195L5 6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M10 11V17"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M14 11V17"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
     </article>
   );
 };

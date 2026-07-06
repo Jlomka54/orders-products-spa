@@ -118,16 +118,14 @@ export const ProductsPage = () => {
   return (
     <section className="products-page">
       <header className="products-page__header">
-        <h1 className="products-page__heading">
-          Продукты / {products.length}
-        </h1>
+        <h1 className="products-page__heading">Продукты / {products.length}</h1>
 
         <button
           className="products-page__add-button"
           type="button"
           onClick={handleOpenCreateProductModal}
         >
-          + Add product
+          + Добавить продукт
         </button>
 
         <ProductsFilters
@@ -141,19 +139,17 @@ export const ProductsPage = () => {
       </header>
 
       {error && (
-        <ErrorMessage message={`Failed to load products: ${error}`} />
+        <ErrorMessage message={`Не удалось загрузить продукты: ${error}`} />
       )}
 
-      {isLoading && (
-        <Loader text="Loading products..." />
-      )}
+      {isLoading && <Loader text="Загрузка продуктов..." />}
 
       {filteredProducts.length === 0 ? (
         <EmptyState
           message={
             products.length === 0
-              ? "No products found."
-              : "No products match filters."
+              ? "Продукты не найдены."
+              : "Нет продуктов, соответствующих фильтрам."
           }
         />
       ) : (
@@ -175,7 +171,9 @@ export const ProductsPage = () => {
 
       <DeleteProductModal
         product={deleteModalProduct}
-        isOpen={deleteModalProductId !== null && deleteModalProductId !== undefined}
+        isOpen={
+          deleteModalProductId !== null && deleteModalProductId !== undefined
+        }
         isLoading={mutationLoading}
         onClose={handleCloseDeleteProductModal}
         onConfirm={handleProductDelete}

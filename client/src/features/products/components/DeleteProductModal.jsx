@@ -22,17 +22,20 @@ const DeleteProductModal = ({
         <button
           className="products-page__modal-close"
           type="button"
-          aria-label="Close delete product confirmation"
+          aria-label="Закрыть подтверждение удаления продукта"
           onClick={onClose}
           disabled={isLoading}
         />
 
-        <h2 className="products-page__modal-title" id="delete-product-modal-title">
-          Delete product?
+        <h2
+          className="products-page__modal-title"
+          id="delete-product-modal-title"
+        >
+          Удалить продукт?
         </h2>
 
         <p className="products-page__modal-text">
-          Are you sure you want to delete {productTitle}?
+          Вы уверены, что хотите удалить продукт {productTitle}?
         </p>
 
         <div className="products-page__modal-actions">
@@ -42,7 +45,7 @@ const DeleteProductModal = ({
             onClick={onClose}
             disabled={isLoading}
           >
-            Cancel
+            Отменить
           </button>
           <button
             className="products-page__modal-button products-page__modal-button--danger"
@@ -50,7 +53,7 @@ const DeleteProductModal = ({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            Delete
+            Удалить
           </button>
         </div>
       </div>
