@@ -122,7 +122,7 @@ const GroupsPage = () => {
   }
 
   return (
-    <section className="orders-page">
+    <section className="groups-page">
       <header className="orders-page__header">
         <button
           className="orders-page__create-button"
