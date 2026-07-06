@@ -7,7 +7,7 @@
     },
     {
       "src": "client/package.json",
-      "use": "@vercel/static-build",
+      "use": "@vercel/static-build@latest",
       "config": {
         "distDir": "dist"
       }
@@ -19,11 +19,12 @@
       "dest": "/server/app.js"
     },
     {
-      "handle": "filesystem"
+      "src": "/assets/(.*)",
+      "dest": "/client/assets/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/client/dist/index.html"
+      "dest": "/client/index.html"
     }
   ]
 }
