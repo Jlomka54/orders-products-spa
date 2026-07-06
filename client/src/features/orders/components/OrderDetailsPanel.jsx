@@ -21,7 +21,13 @@ const DetailProductPhoto = ({ product }) => {
   );
 };
 
-const OrderDetailsPanel = ({ selectedOrderDetails, onAddProduct }) => {
+const OrderDetailsPanel = ({
+  selectedOrderDetails,
+  onAddProduct,
+  onEditProduct,
+  onDeleteProduct,
+  isLoading,
+}) => {
   if (!selectedOrderDetails) {
     return null;
   }
@@ -63,11 +69,24 @@ const OrderDetailsPanel = ({ selectedOrderDetails, onAddProduct }) => {
               <span className="orders-page__details-product-status">
                 {product.isNew ? "Свободен" : "В ремонте"}
               </span>
-              <button
-                className="orders-page__details-product-delete"
-                type="button"
-                aria-label="Удалить продукт"
-              />
+              <span className="orders-page__details-product-actions">
+                <button
+                  className="orders-page__details-product-edit"
+                  type="button"
+                  aria-label="Редактировать продукт"
+                  onClick={() => onEditProduct(product)}
+                  disabled={isLoading}
+                />
+                <button
+                  className="orders-page__details-product-delete"
+                  type="button"
+                  aria-label="Удалить продукт"
+                  onClick={() => onDeleteProduct(product)}
+                  disabled={isLoading}
+                >
+                  Удалить
+                </button>
+              </span>
             </li>
           ))}
         </ul>

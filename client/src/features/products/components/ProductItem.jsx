@@ -27,7 +27,7 @@ const getOrderTitle = (product) => {
   return String(product.order);
 };
 
-const ProductItem = ({ product }) => {
+const ProductItem = ({ product, isLoading, onEdit, onDelete }) => {
   const [hasImageError, setHasImageError] = useState(false);
   const usdPrice = findPrice(product.price, "USD");
   const uahPrice = findPrice(product.price, "UAH");
@@ -95,11 +95,24 @@ const ProductItem = ({ product }) => {
         {formatLongDate(product.date)}
       </span>
 
-      <button
-        className="products-page__delete-button"
-        type="button"
-        aria-label="Удалить продукт"
-      />
+      <div className="products-page__actions">
+        <button
+          className="products-page__edit-button"
+          type="button"
+          onClick={() => onEdit(product)}
+          disabled={isLoading}
+        >
+          Изменить
+        </button>
+        <button
+          className="products-page__delete-button"
+          type="button"
+          onClick={() => onDelete(product)}
+          disabled={isLoading}
+        >
+          Удалить
+        </button>
+      </div>
     </article>
   );
 };

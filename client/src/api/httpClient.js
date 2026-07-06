@@ -26,8 +26,11 @@ const serverMessageTranslations = {
   "At least one price is required": "Укажите хотя бы одну цену продукта.",
   "Each price must include a non-negative value and currency symbol": "Цена должна быть неотрицательным числом с указанной валютой.",
   "Product already exists": "Такой продукт уже существует.",
+  "Product not found": "Продукт не найден. Обновите страницу и попробуйте снова.",
   "Failed to create product": "Не удалось создать продукт на сервере.",
-  "Failed to get order": "Продукт создан, но не удалось обновить данные прихода. Обновите страницу.",
+  "Failed to update product": "Не удалось сохранить изменения продукта.",
+  "Failed to delete product": "Не удалось удалить продукт.",
+  "Failed to get order": "Действие выполнено, но не удалось обновить данные прихода. Обновите страницу.",
   "Order not found": "Выбранный приход не найден. Обновите страницу и попробуйте снова.",
 };
 

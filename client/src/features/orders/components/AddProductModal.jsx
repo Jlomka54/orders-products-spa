@@ -2,41 +2,69 @@ import { useState } from "react";
 
 const getTodayInputValue = () => new Date().toISOString().slice(0, 10);
 
-const initialFormState = {
-  title: "",
-  serialNumber: "",
-  photo: "pathToFile.jpg",
-  type: "",
-  specification: "",
-  guaranteeStart: getTodayInputValue(),
-  guaranteeEnd: getTodayInputValue(),
-  usdPrice: "",
-  uahPrice: "",
-  isNew: true,
-  date: getTodayInputValue(),
+const toDateInputValue = (value) => {
+  if (!value) {
+    return getTodayInputValue();
+  }
+
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+    return value.slice(0, 10);
+  }
+
+  const parsedDate = new Date(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return getTodayInputValue();
+  }
+
+  return parsedDate.toISOString().slice(0, 10);
 };
+
+const findPrice = (prices, symbol) => {
+  if (!Array.isArray(prices)) {
+    return null;
+  }
+
+  return prices.find((price) => price?.symbol === symbol) || null;
+};
+
+const getInitialFormState = (product) => ({
+  title: product?.title ?? "",
+  serialNumber: product?.serialNumber ?? "",
+  photo: product?.photo ?? "pathToFile.jpg",
+  type: product?.type ?? "",
+  specification: product?.specification ?? "",
+  guaranteeStart: toDateInputValue(product?.guarantee?.start),
+  guaranteeEnd: toDateInputValue(product?.guarantee?.end),
+  usdPrice: findPrice(product?.price, "USD")?.value ?? "",
+  uahPrice: findPrice(product?.price, "UAH")?.value ?? "",
+  isNew: product?.isNew ?? true,
+  date: toDateInputValue(product?.date),
+});
 
 const AddProductModal = ({
   isOpen,
   isLoading,
+  mode = "add",
   orderLinkId,
   orderTitle,
+  product,
   error,
   onClose,
   onSubmit,
 }) => {
-  const [form, setForm] = useState(initialFormState);
+  const [form, setForm] = useState(() => getInitialFormState(product));
 
   if (!isOpen) {
     return null;
   }
 
   const handleChange = (event) => {
-    const { name, type, checked, value } = event.target;
+    const { name, value } = event.target;
 
     setForm((currentForm) => ({
       ...currentForm,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: name === "isNew" ? value === "true" : value,
     }));
   };
 
@@ -93,7 +121,9 @@ const AddProductModal = ({
         />
 
         <h2 className="orders-page__modal-title">
-          Добавить продукт в {orderTitle || "приход"}
+          {mode === "edit"
+            ? `Редактировать ${product?.title || "продукт"}`
+            : `Добавить продукт в ${orderTitle || "приход"}`}
         </h2>
 
         <form className="orders-page__product-form" onSubmit={handleSubmit}>
@@ -222,15 +252,18 @@ const AddProductModal = ({
             />
           </label>
 
-          <label className="orders-page__product-check">
-            <input
+          <label className="orders-page__product-field">
+            <span>Статус</span>
+            <select
+              className="orders-page__product-select"
               name="isNew"
-              type="checkbox"
-              checked={form.isNew}
+              value={String(form.isNew)}
               onChange={handleChange}
               disabled={isLoading}
-            />
-            <span>Свободен</span>
+            >
+              <option value="true">Свободен</option>
+              <option value="false">В ремонте</option>
+            </select>
           </label>
 
           {(!hasOrderLink || error) && (
@@ -255,7 +288,13 @@ const AddProductModal = ({
               type="submit"
               disabled={isLoading || !hasOrderLink}
             >
-              {isLoading ? "Добавление..." : "Добавить"}
+              {isLoading
+                ? mode === "edit"
+                  ? "Сохранение..."
+                  : "Добавление..."
+                : mode === "edit"
+                  ? "Сохранить"
+                  : "Добавить"}
             </button>
           </div>
         </form>

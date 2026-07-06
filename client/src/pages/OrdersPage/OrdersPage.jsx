@@ -15,8 +15,10 @@ import {
   fetchOrderById,
   fetchOrders,
   openDeleteModal,
+  removeProductFromOrder,
   removeOrder,
   setSelectedOrderId,
+  updateProductInOrder,
 } from "../../features/orders/ordersSlice";
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
 import AddProductModal from "../../features/orders/components/AddProductModal";
@@ -33,8 +35,9 @@ import "./OrdersPage.css";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
-  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
-  const [addProductError, setAddProductError] = useState("");
+  const [productModalMode, setProductModalMode] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productActionError, setProductActionError] = useState("");
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
@@ -42,6 +45,7 @@ const OrdersPage = () => {
   const selectedOrderDetails = useSelector(selectSelectedOrderDetails);
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
+  const isProductModalOpen = productModalMode !== null;
 
   const selectedDetailsId = getOrderId(selectedOrderDetails);
   const activeSelectedOrderDetails =
@@ -85,8 +89,15 @@ const OrdersPage = () => {
   };
 
   const handleOpenAddProductModal = () => {
-    setAddProductError("");
-    setIsAddProductModalOpen(true);
+    setProductActionError("");
+    setEditingProduct(null);
+    setProductModalMode("add");
+  };
+
+  const handleOpenEditProductModal = (product) => {
+    setProductActionError("");
+    setEditingProduct(product);
+    setProductModalMode("edit");
   };
 
   const handleCloseAddProductModal = () => {
@@ -94,28 +105,82 @@ const OrdersPage = () => {
       return;
     }
 
-    setIsAddProductModalOpen(false);
-    setAddProductError("");
+    setProductModalMode(null);
+    setEditingProduct(null);
+    setProductActionError("");
   };
 
-  const handleAddProduct = async (product) => {
+  const getProductRequestId = (product) => product?._id ?? product?.id ?? null;
+
+  const handleSaveProduct = async (product) => {
     if (selectedOrderId === null || selectedOrderId === undefined) {
       return;
     }
 
-    setAddProductError("");
+    setProductActionError("");
+
+    try {
+      if (productModalMode === "edit") {
+        const productId = getProductRequestId(editingProduct);
+
+        if (productId === null || productId === undefined) {
+          setProductActionError("Не удалось определить ID продукта для редактирования.");
+          return;
+        }
+
+        await dispatch(
+          updateProductInOrder({
+            orderId: selectedOrderId,
+            productId,
+            product,
+          }),
+        ).unwrap();
+      } else {
+        await dispatch(
+          addProductToOrder({
+            orderId: selectedOrderId,
+            product,
+          }),
+        ).unwrap();
+      }
+
+      setProductModalMode(null);
+      setEditingProduct(null);
+    } catch (submitError) {
+      setProductActionError(
+        submitError || "Не удалось добавить продукт. Попробуйте еще раз.",
+      );
+    }
+  };
+
+  const handleDeleteProduct = async (product) => {
+    if (selectedOrderId === null || selectedOrderId === undefined) {
+      return;
+    }
+
+    const productId = getProductRequestId(product);
+
+    if (productId === null || productId === undefined) {
+      setProductActionError("Не удалось определить ID продукта для удаления.");
+      return;
+    }
+
+    if (!window.confirm(`Удалить продукт "${product.title}"?`)) {
+      return;
+    }
+
+    setProductActionError("");
 
     try {
       await dispatch(
-        addProductToOrder({
+        removeProductFromOrder({
           orderId: selectedOrderId,
-          product,
+          productId,
         }),
       ).unwrap();
-      setIsAddProductModalOpen(false);
-    } catch (submitError) {
-      setAddProductError(
-        submitError || "Не удалось добавить продукт. Попробуйте еще раз.",
+    } catch (deleteError) {
+      setProductActionError(
+        deleteError || "Не удалось удалить продукт. Попробуйте еще раз.",
       );
     }
   };
@@ -168,18 +233,28 @@ const OrdersPage = () => {
         <OrderDetailsPanel
           selectedOrderDetails={activeSelectedOrderDetails}
           onAddProduct={handleOpenAddProductModal}
+          onEditProduct={handleOpenEditProductModal}
+          onDeleteProduct={handleDeleteProduct}
+          isLoading={isLoading}
         />
       </div>
 
-      {isAddProductModalOpen && (
+      {productActionError && !isProductModalOpen && (
+        <p className="orders-page__action-error">{productActionError}</p>
+      )}
+
+      {isProductModalOpen && (
         <AddProductModal
-          isOpen={isAddProductModalOpen}
+          key={`${productModalMode}-${getProductRequestId(editingProduct) ?? "new"}`}
+          isOpen={isProductModalOpen}
           isLoading={isLoading}
+          mode={productModalMode}
           orderLinkId={orderLinkId}
           orderTitle={activeSelectedOrderDetails?.title}
-          error={addProductError}
+          product={editingProduct}
+          error={productActionError}
           onClose={handleCloseAddProductModal}
-          onSubmit={handleAddProduct}
+          onSubmit={handleSaveProduct}
         />
       )}
 

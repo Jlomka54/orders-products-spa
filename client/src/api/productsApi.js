@@ -17,3 +17,15 @@ export const createProductApi = async (product) => {
 
   return response.data;
 };
+
+export const updateProductApi = async (productId, product) => {
+  const response = await httpClient.put(`/products/${productId}`, product);
+
+  return response.data;
+};
+
+export const deleteProductApi = async (productId) => {
+  const response = await httpClient.delete(`/products/${productId}`);
+
+  return response.data;
+};

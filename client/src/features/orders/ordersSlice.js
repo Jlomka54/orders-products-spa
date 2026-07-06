@@ -4,7 +4,11 @@ import {
   getOrderByIdApi,
   getOrdersWithDetailsApi,
 } from "../../api/ordersApi";
-import { createProductApi } from "../../api/productsApi";
+import {
+  createProductApi,
+  deleteProductApi,
+  updateProductApi,
+} from "../../api/productsApi";
 import {
   getOrderId,
   isSameOrder,
@@ -65,6 +69,38 @@ export const addProductToOrder = createAsyncThunk(
   },
 );
 
+export const updateProductInOrder = createAsyncThunk(
+  "orders/updateProductInOrder",
+  async ({ orderId, productId, product }, { rejectWithValue }) => {
+    try {
+      await updateProductApi(productId, product);
+
+      return {
+        orderId,
+        selectedOrderDetails: await getOrderByIdApi(orderId),
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const removeProductFromOrder = createAsyncThunk(
+  "orders/removeProductFromOrder",
+  async ({ orderId, productId }, { rejectWithValue }) => {
+    try {
+      await deleteProductApi(productId);
+
+      return {
+        orderId,
+        selectedOrderDetails: await getOrderByIdApi(orderId),
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
 const initialState = {
   items: [],
   selectedOrderId: null,
@@ -82,6 +118,23 @@ const setPendingState = (state) => {
 const setRejectedState = (state, action) => {
   state.isLoading = false;
   state.error = action.payload || action.error.message || "Orders request failed";
+};
+
+const updateOrderDetailsState = (state, action) => {
+  const { orderId, selectedOrderDetails } = action.payload;
+  const normalizedOrderDetails = normalizeOrder(selectedOrderDetails);
+
+  state.selectedOrderDetails = normalizedOrderDetails;
+  state.items = state.items.map((order) =>
+    isSameOrder(getOrderId(order), orderId)
+      ? {
+          ...order,
+          ...normalizedOrderDetails,
+        }
+      : order,
+  );
+  state.isLoading = false;
+  state.error = null;
 };
 
 const ordersSlice = createSlice({
@@ -141,23 +194,14 @@ const ordersSlice = createSlice({
       })
       .addCase(removeOrder.rejected, setRejectedState)
       .addCase(addProductToOrder.pending, setPendingState)
-      .addCase(addProductToOrder.fulfilled, (state, action) => {
-        const { orderId, selectedOrderDetails } = action.payload;
-        const normalizedOrderDetails = normalizeOrder(selectedOrderDetails);
-
-        state.selectedOrderDetails = normalizedOrderDetails;
-        state.items = state.items.map((order) =>
-          isSameOrder(getOrderId(order), orderId)
-            ? {
-                ...order,
-                ...normalizedOrderDetails,
-              }
-            : order,
-        );
-        state.isLoading = false;
-        state.error = null;
-      })
-      .addCase(addProductToOrder.rejected, setRejectedState);
+      .addCase(addProductToOrder.fulfilled, updateOrderDetailsState)
+      .addCase(addProductToOrder.rejected, setRejectedState)
+      .addCase(updateProductInOrder.pending, setPendingState)
+      .addCase(updateProductInOrder.fulfilled, updateOrderDetailsState)
+      .addCase(updateProductInOrder.rejected, setRejectedState)
+      .addCase(removeProductFromOrder.pending, setPendingState)
+      .addCase(removeProductFromOrder.fulfilled, updateOrderDetailsState)
+      .addCase(removeProductFromOrder.rejected, setRejectedState);
   },
 });
 

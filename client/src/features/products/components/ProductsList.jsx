@@ -1,6 +1,11 @@
 import ProductItem from "./ProductItem";
 
-const ProductsList = ({ products }) => {
+const ProductsList = ({
+  products,
+  isLoading,
+  onEditProduct,
+  onDeleteProduct,
+}) => {
   return (
     <ul className="products-page__list">
       {products.map((product, index) => (
@@ -8,7 +13,12 @@ const ProductsList = ({ products }) => {
           className="products-page__item"
           key={product.id ?? product._id ?? product.serialNumber ?? index}
         >
-          <ProductItem product={product} />
+          <ProductItem
+            product={product}
+            isLoading={isLoading}
+            onEdit={onEditProduct}
+            onDelete={onDeleteProduct}
+          />
         </li>
       ))}
     </ul>
