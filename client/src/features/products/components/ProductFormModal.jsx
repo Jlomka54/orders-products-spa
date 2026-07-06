@@ -24,8 +24,8 @@ const ProductFormModalContent = ({
   const [form, setForm] = useState(() => getInitialForm(mode, product));
 
   const isEditMode = mode === "edit";
-  const title = isEditMode ? "Edit product" : "Create product";
-  const submitText = isEditMode ? "Save product" : "Create product";
+  const title = isEditMode ? "Редактировать продукт" : "Создать продукт";
+  const submitText = isEditMode ? "Сохранить продукт" : "Создать продукт";
 
   const handleChange = (event) => {
     const { name, type, checked, value } = event.target;
@@ -59,17 +59,7 @@ const ProductFormModalContent = ({
           <button
             className="product-form-modal__close-button"
             type="button"
-            aria-label="Close product form"
-            onClick={onClose}
-            disabled={isLoading}
-          />
-        </div>
-
-        <form className="product-form-modal__form" onSubmit={handleSubmit}>
-          <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Legacy ID</span>
-            <input
-              className="product-form-modal__input"
+              aria-label="Закрыть форму продукта"
               type="number"
               name="legacyId"
               value={form.legacyId}
@@ -92,7 +82,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Serial number</span>
+            <span className="product-form-modal__label">Серийный номер</span>
             <input
               className="product-form-modal__input"
               type="number"
@@ -113,11 +103,11 @@ const ProductFormModalContent = ({
               onChange={handleChange}
               disabled={isLoading}
             />
-            <span className="product-form-modal__label">New product</span>
+            <span className="product-form-modal__label">Новый продукт</span>
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Photo URL</span>
+            <span className="product-form-modal__label">URL фото</span>
             <input
               className="product-form-modal__input"
               type="url"
@@ -130,7 +120,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Type</span>
+            <span className="product-form-modal__label">Тип</span>
             <input
               className="product-form-modal__input"
               type="text"
@@ -143,7 +133,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Specification</span>
+            <span className="product-form-modal__label">Спецификация</span>
             <input
               className="product-form-modal__input"
               type="text"
@@ -156,7 +146,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Guarantee start</span>
+            <span className="product-form-modal__label">Гарантия с</span>
             <input
               className="product-form-modal__input"
               type="text"
@@ -169,7 +159,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Guarantee end</span>
+            <span className="product-form-modal__label">Гарантия по</span>
             <input
               className="product-form-modal__input"
               type="text"
@@ -182,7 +172,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Price USD</span>
+            <span className="product-form-modal__label">Цена USD</span>
             <input
               className="product-form-modal__input"
               type="number"
@@ -197,7 +187,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Price UAH</span>
+            <span className="product-form-modal__label">Цена UAH</span>
             <input
               className="product-form-modal__input"
               type="number"
@@ -212,7 +202,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Order</span>
+            <span className="product-form-modal__label">Приход</span>
             <input
               className="product-form-modal__input"
               type="number"
@@ -225,7 +215,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Date</span>
+            <span className="product-form-modal__label">Дата</span>
             <input
               className="product-form-modal__input"
               type="text"
@@ -244,7 +234,7 @@ const ProductFormModalContent = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              Отменить
             </button>
             <button
               className="product-form-modal__button product-form-modal__button--primary"

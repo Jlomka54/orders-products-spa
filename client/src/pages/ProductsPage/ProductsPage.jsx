@@ -127,12 +127,7 @@ export const ProductsPage = () => {
           type="button"
           onClick={handleOpenCreateProductModal}
         >
-          + Add product
-        </button>
-
-        <ProductsFilters
-          productTypes={productTypes}
-          productSpecifications={productSpecifications}
+        + Добавить продукт
           selectedType={selectedType}
           selectedSpecification={selectedSpecification}
           onTypeChange={handleTypeChange}
@@ -141,19 +136,19 @@ export const ProductsPage = () => {
       </header>
 
       {error && (
-        <ErrorMessage message={`Failed to load products: ${error}`} />
+        <ErrorMessage message={`Не удалось загрузить продукты: ${error}`} />
       )}
 
       {isLoading && (
-        <Loader text="Loading products..." />
+        <Loader text="Загрузка продуктов..." />
       )}
 
       {filteredProducts.length === 0 ? (
         <EmptyState
           message={
             products.length === 0
-              ? "No products found."
-              : "No products match filters."
+              ? "Продукты не найдены."
+              : "Нет продуктов, соответствующих фильтрам."
           }
         />
       ) : (

@@ -53,7 +53,9 @@ const ProductItem = ({ product, onEdit, onDelete }) => {
             onError={() => setHasImageError(true)}
           />
         ) : (
-          <span className="products-page__image-placeholder">No image</span>
+          <span className="products-page__image-placeholder">
+            Нет изображения
+          </span>
         )}
       </div>
 
@@ -102,13 +104,13 @@ const ProductItem = ({ product, onEdit, onDelete }) => {
         type="button"
         onClick={() => onEdit(product)}
       >
-        Edit
+        Изменить
       </button>
 
       <button
         className="products-page__delete-button"
         type="button"
-        aria-label="Delete product"
+        aria-label="Удалить продукт"
         onClick={() => onDelete(productId)}
       />
     </article>

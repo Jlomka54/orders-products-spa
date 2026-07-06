@@ -136,11 +136,11 @@ const GroupsPage = () => {
   };
 
   if (isInitialLoading) {
-    return <Loader text="Loading orders..." />;
+    return <Loader text="Загрузка групп..." />;
   }
 
   if (hasBlockingError) {
-    return <ErrorMessage message={`Failed to load orders: ${error}`} />;
+    return <ErrorMessage message={`Не удалось загрузить группы: ${error}`} />;
   }
 
   return (
@@ -149,10 +149,10 @@ const GroupsPage = () => {
         <button
           className="orders-page__create-button"
           type="button"
-          aria-label="Create group"
+          aria-label="Создать группу"
           onClick={handleOpenCreateOrderModal}
         >
-          + Create group
+          + Создать группу
         </button>
         <h1 className="orders-page__heading">Группы / {orders.length}</h1>
       </header>
@@ -183,7 +183,7 @@ const GroupsPage = () => {
           />
         </div>
       ) : (
-        <EmptyState message="No orders found." />
+        <EmptyState message="Группы не найдены." />
       )}
 
       <OrderFormModal

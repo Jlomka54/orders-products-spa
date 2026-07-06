@@ -54,11 +54,11 @@ const OrdersPage = () => {
   };
 
   if (isInitialLoading) {
-    return <Loader text="Loading orders..." />;
+    return <Loader text="Загрузка приходов..." />;
   }
 
   if (hasBlockingError) {
-    return <ErrorMessage message={`Failed to load orders: ${error}`} />;
+    return <ErrorMessage message={`Не удалось загрузить приходы: ${error}`} />;
   }
 
   return (
@@ -70,17 +70,17 @@ const OrdersPage = () => {
       {(error || isLoading) && (
         <div className="orders-page__status">
           {error && (
-            <ErrorMessage message={`Failed to load orders: ${error}`} />
+            <ErrorMessage message={`Не удалось загрузить приходы: ${error}`} />
           )}
 
-          {isLoading && <Loader text="Loading orders..." />}
+          {isLoading && <Loader text="Загрузка приходов..." />}
         </div>
       )}
 
       {hasOrders ? (
         <ArrivalsList orders={orders} onDeleteOrder={handleOpenDeleteModal} />
       ) : (
-        <EmptyState message="No orders found." />
+        <EmptyState message="Приходы не найдены." />
       )}
 
       <DeleteOrderModal

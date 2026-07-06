@@ -7,8 +7,8 @@ const createEmptyGroupForm = () => ({
 
 const OrderFormModalContent = ({ isLoading, onClose, onSubmit }) => {
   const [form, setForm] = useState(() => createEmptyGroupForm());
-  const title = "Create group";
-  const submitText = "Create group";
+  const title = "Создать группу";
+  const submitText = "Создать группу";
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -50,7 +50,7 @@ const OrderFormModalContent = ({ isLoading, onClose, onSubmit }) => {
 
         <form className="order-form-modal__form" onSubmit={handleSubmit}>
           <label className="order-form-modal__field">
-            <span className="order-form-modal__label">Group name</span>
+            <span className="order-form-modal__label">Название группы</span>
             <input
               className="order-form-modal__input"
               type="text"
@@ -63,7 +63,7 @@ const OrderFormModalContent = ({ isLoading, onClose, onSubmit }) => {
           </label>
 
           <label className="order-form-modal__field">
-            <span className="order-form-modal__label">Description</span>
+            <span className="order-form-modal__label">Описание</span>
             <textarea
               className="order-form-modal__textarea"
               name="description"
@@ -81,7 +81,7 @@ const OrderFormModalContent = ({ isLoading, onClose, onSubmit }) => {
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              Отменить
             </button>
             <button
               className="order-form-modal__button order-form-modal__button--primary"

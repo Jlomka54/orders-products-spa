@@ -59,7 +59,7 @@ const OrderDetailsPanel = ({
             type="button"
             onClick={() => onEditOrder(selectedOrderDetails)}
           >
-            Edit order
+            Редактировать приход
           </button>
         )}
       </div>

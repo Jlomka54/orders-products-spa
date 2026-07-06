@@ -29,17 +29,17 @@ const RegisterPage = () => {
     const trimmedUsername = username.trim();
 
     if (!trimmedUsername) {
-      setFormError("Name is required");
+      setFormError("Имя обязательно");
       return;
     }
 
     if (!password) {
-      setFormError("Password is required");
+      setFormError("Пароль обязателен");
       return;
     }
 
     if (password.length < 6) {
-      setFormError("Password must be at least 6 characters");
+      setFormError("Пароль должен быть не менее 6 символов");
       return;
     }
 
@@ -61,10 +61,10 @@ const RegisterPage = () => {
   return (
     <section className="register-page">
       <form className="register-page__form" onSubmit={handleSubmit}>
-        <h1 className="register-page__title">Register</h1>
+        <h1 className="register-page__title">Регистрация</h1>
 
         <label className="register-page__field">
-          <span className="register-page__label">Name</span>
+          <span className="register-page__label">Имя</span>
           <input
             className="register-page__input"
             type="text"
@@ -75,7 +75,7 @@ const RegisterPage = () => {
         </label>
 
         <label className="register-page__field">
-          <span className="register-page__label">Password</span>
+          <span className="register-page__label">Пароль</span>
           <input
             className="register-page__input"
             type="password"
@@ -94,11 +94,11 @@ const RegisterPage = () => {
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? "Creating account..." : "Register"}
+          {isLoading ? "Создание аккаунта..." : "Создать аккаунт"}
         </button>
 
         <p className="register-page__hint">
-          Already have an account? <Link to="/login">Login</Link>
+          Уже есть аккаунт? <Link to="/login">Войти</Link>
         </p>
       </form>
     </section>

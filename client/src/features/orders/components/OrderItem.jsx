@@ -55,13 +55,13 @@ const OrderItem = ({ order, isSelected, onSelect, onDelete, onEdit }) => {
         type="button"
         onClick={handleEditClick}
       >
-        Edit
+        Изменить
       </button>
 
       <button
         className="orders-page__delete-button"
         type="button"
-        aria-label="Delete order"
+        aria-label="Удалить приход"
         onClick={handleDeleteClick}
       />
     </div>
