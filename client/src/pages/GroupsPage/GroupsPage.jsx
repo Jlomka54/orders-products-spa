@@ -27,6 +27,7 @@ import {
   fetchOrderById,
   fetchOrders,
   openCreateOrderModal,
+  openEditOrderModal,
   openDeleteModal,
   removeOrder,
   setSelectedOrderId,
@@ -48,7 +49,7 @@ import {
 } from "../../utils/orderHelpers";
 import "./GroupsPage.css";
 
-const GroupsPage = () => {
+export const GroupsPage = () => {
   const dispatch = useDispatch();
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
@@ -112,6 +113,10 @@ const GroupsPage = () => {
     dispatch(openCreateProductModal());
   };
 
+  const handleOpenEditOrderModal = (order) => {
+    dispatch(openEditOrderModal(order));
+  };
+
   const handleCloseDeleteModal = () => {
     dispatch(closeDeleteModal());
   };
@@ -131,8 +136,13 @@ const GroupsPage = () => {
   };
 
   const handleProductSubmit = (payload) => {
-    const productPayload = selectedOrderId
-      ? { ...payload, order: Number(selectedOrderId) }
+    // Products link to an order through the order's numeric `legacyId`,
+    // NOT its Mongo `_id`. `selectedOrderId` is usually the Mongo `_id`
+    // (a hex string), so `Number(selectedOrderId)` used to produce NaN
+    // and silently orphaned the product from its order.
+    const orderLegacyId = selectedOrderDetails?.legacyId;
+    const productPayload = orderLegacyId
+      ? { ...payload, order: Number(orderLegacyId) }
       : payload;
 
     dispatch(createProduct(productPayload));
@@ -185,6 +195,7 @@ const GroupsPage = () => {
             selectedOrderId={selectedOrderId}
             onOrderSelect={handleOrderClick}
             onDeleteOrder={handleOpenDeleteModal}
+            onEditOrder={handleOpenEditOrderModal}
           />
 
           <OrderDetailsPanel
@@ -209,8 +220,11 @@ const GroupsPage = () => {
         isOpen={isProductFormOpen}
         mode="create"
         product={
-          selectedOrderId
-            ? { order: Number(selectedOrderId), date: new Date().toISOString() }
+          selectedOrderDetails?.legacyId
+            ? {
+                order: Number(selectedOrderDetails.legacyId),
+                date: new Date().toISOString(),
+              }
             : undefined
         }
         isLoading={productMutationLoading}

@@ -165,6 +165,8 @@ export const ProductsPage = () => {
         mode={productFormMode}
         product={editingProduct}
         isLoading={mutationLoading}
+        productTypes={productTypes}
+        productSpecifications={productSpecifications}
         onClose={handleCloseProductFormModal}
         onSubmit={handleProductSubmit}
       />

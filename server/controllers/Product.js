@@ -1,28 +1,11 @@
 import mongoose from "mongoose";
 import Product from "../models/Product.js";
-import Order from "../models/Order.js";
 
 const getDuplicateField = (error) => {
   return Object.keys(error.keyPattern ?? error.keyValue ?? {})[0];
 };
 
 const isNumeric = (value) => value !== "" && !Number.isNaN(Number(value));
-
-const removeEmbeddedProductFromOrders = async (productId) => {
-  if (productId === null || productId === undefined) {
-    return;
-  }
-
-  await Order.updateMany(
-    { "products.id": productId },
-    { $pull: { products: { id: productId } } },
-  );
-
-  await Order.updateMany(
-    { "products.legacyId": productId },
-    { $pull: { products: { legacyId: productId } } },
-  );
-};
 
 export const getProducts = async (req, res) => {
   try {
@@ -146,8 +129,6 @@ export const deleteProduct = async (req, res) => {
         message: "Product not found",
       });
     }
-
-    await removeEmbeddedProductFromOrders(product._id ?? product.legacyId ?? product.id);
 
     return res.json({
       product,
