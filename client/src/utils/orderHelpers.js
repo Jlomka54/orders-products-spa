@@ -6,8 +6,6 @@ export const getOrderId = (order) => {
   return order._id ?? order.legacyId ?? order.id ?? null;
 };
 
-export const getOrderRequestId = (order) => getOrderId(order);
-
 export const getOrderProducts = (order) => {
   if (Array.isArray(order?.products)) {
     return order.products;
