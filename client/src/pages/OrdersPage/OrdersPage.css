@@ -226,8 +226,7 @@
 }
 
 .orders-page__delete-button:hover,
-.orders-page__details-product-delete:hover,
-.products-page__delete-button:hover {
+.orders-page__details-product-edit:hover {
   color: #ef3d58;
 }
 
@@ -271,6 +270,7 @@
 
 .orders-page__details-panel {
   position: relative;
+  z-index: 1;
   flex: 1;
   min-width: 540px;
   overflow: visible;
@@ -379,12 +379,18 @@
 
 .orders-page__details-product {
   display: grid;
-  grid-template-columns: 12px 58px minmax(0, 1fr) 112px 34px;
+  grid-template-columns: 12px 58px minmax(0, 1fr) 112px 140px;
   gap: 18px;
   align-items: center;
   min-height: 55px;
   padding: 8px 30px 8px 42px;
   border-top: 1px solid var(--color-line);
+}
+
+.orders-page__details-product-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
 }
 
 .orders-page__details-product::before {
@@ -472,6 +478,12 @@
   margin: 0;
   padding: 18px 38px;
   color: var(--color-muted);
+}
+
+.orders-page__action-error {
+  margin: 18px 0 0;
+  color: #ef3d58;
+  font-size: 14px;
 }
 
 .orders-page__modal-backdrop {
@@ -585,6 +597,12 @@
 
 .orders-page__modal-button--danger {
   color: #ef3d58;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.orders-page__modal-button--primary {
+  color: var(--color-accent);
   background: #fff;
   box-shadow: var(--shadow-card);
 }
@@ -813,8 +831,12 @@
   }
 
   .orders-page__details-product-status,
-  .orders-page__details-product-delete {
+  .orders-page__details-product-actions {
     grid-column: 3 / -1;
+  }
+
+  .orders-page__details-product-actions {
+    justify-content: flex-start;
   }
 
   .orders-page__modal-actions {

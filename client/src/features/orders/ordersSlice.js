@@ -7,6 +7,11 @@ import {
   updateOrderApi,
 } from "../../api/ordersApi";
 import {
+  createProductApi,
+  deleteProductApi,
+  updateProductApi,
+} from "../../api/productsApi";
+import {
   getOrderId,
   isSameOrder,
   normalizeOrder,
@@ -72,6 +77,54 @@ export const removeOrder = createAsyncThunk(
       return {
         orderId,
         response,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const addProductToOrder = createAsyncThunk(
+  "orders/addProductToOrder",
+  async ({ orderId, product }, { rejectWithValue }) => {
+    try {
+      await createProductApi(product);
+
+      return {
+        orderId,
+        selectedOrderDetails: await getOrderByIdApi(orderId),
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const updateProductInOrder = createAsyncThunk(
+  "orders/updateProductInOrder",
+  async ({ orderId, productId, product }, { rejectWithValue }) => {
+    try {
+      await updateProductApi(productId, product);
+
+      return {
+        orderId,
+        selectedOrderDetails: await getOrderByIdApi(orderId),
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const removeProductFromOrder = createAsyncThunk(
+  "orders/removeProductFromOrder",
+  async ({ orderId, productId }, { rejectWithValue }) => {
+    try {
+      await deleteProductApi(productId);
+
+      return {
+        orderId,
+        selectedOrderDetails: await getOrderByIdApi(orderId),
       };
     } catch (error) {
       return rejectWithValue(error.message);

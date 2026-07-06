@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../../components/ui/EmptyState";
 import ErrorMessage from "../../components/ui/ErrorMessage";
@@ -14,24 +14,37 @@ import {
   selectOrdersMutationLoading,
 } from "../../features/orders/ordersSelectors";
 import {
+  addProductToOrder,
   closeDeleteModal,
   fetchOrders,
   openDeleteModal,
+  removeProductFromOrder,
   removeOrder,
 } from "../../features/orders/ordersSlice";
 import "./OrdersPage.css";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
+  const [productModalMode, setProductModalMode] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productActionError, setProductActionError] = useState("");
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
+  const isProductModalOpen = productModalMode !== null;
 
   const hasOrders = orders.length > 0;
   const isInitialLoading = isLoading && !hasOrders;
   const hasBlockingError = error && !hasOrders;
+  const orderLinkId = (() => {
+    const rawOrderLinkId =
+      activeSelectedOrderDetails?.legacyId ?? activeSelectedOrderDetails?.id;
+    const numericOrderLinkId = Number(rawOrderLinkId);
+
+    return Number.isFinite(numericOrderLinkId) ? numericOrderLinkId : null;
+  })();
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -51,6 +64,103 @@ const OrdersPage = () => {
     }
 
     dispatch(removeOrder(deleteModalOrderId));
+  };
+
+  const handleOpenAddProductModal = () => {
+    setProductActionError("");
+    setEditingProduct(null);
+    setProductModalMode("add");
+  };
+
+  const handleOpenEditProductModal = (product) => {
+    setProductActionError("");
+    setEditingProduct(product);
+    setProductModalMode("edit");
+  };
+
+  const handleCloseAddProductModal = () => {
+    if (isLoading) {
+      return;
+    }
+
+    setProductModalMode(null);
+    setEditingProduct(null);
+    setProductActionError("");
+  };
+
+  const getProductRequestId = (product) => product?._id ?? product?.id ?? null;
+
+  const handleSaveProduct = async (product) => {
+    if (selectedOrderId === null || selectedOrderId === undefined) {
+      return;
+    }
+
+    setProductActionError("");
+
+    try {
+      if (productModalMode === "edit") {
+        const productId = getProductRequestId(editingProduct);
+
+        if (productId === null || productId === undefined) {
+          setProductActionError("Не удалось определить ID продукта для редактирования.");
+          return;
+        }
+
+        await dispatch(
+          updateProductInOrder({
+            orderId: selectedOrderId,
+            productId,
+            product,
+          }),
+        ).unwrap();
+      } else {
+        await dispatch(
+          addProductToOrder({
+            orderId: selectedOrderId,
+            product,
+          }),
+        ).unwrap();
+      }
+
+      setProductModalMode(null);
+      setEditingProduct(null);
+    } catch (submitError) {
+      setProductActionError(
+        submitError || "Не удалось добавить продукт. Попробуйте еще раз.",
+      );
+    }
+  };
+
+  const handleDeleteProduct = async (product) => {
+    if (selectedOrderId === null || selectedOrderId === undefined) {
+      return;
+    }
+
+    const productId = getProductRequestId(product);
+
+    if (productId === null || productId === undefined) {
+      setProductActionError("Не удалось определить ID продукта для удаления.");
+      return;
+    }
+
+    if (!window.confirm(`Удалить продукт "${product.title}"?`)) {
+      return;
+    }
+
+    setProductActionError("");
+
+    try {
+      await dispatch(
+        removeProductFromOrder({
+          orderId: selectedOrderId,
+          productId,
+        }),
+      ).unwrap();
+    } catch (deleteError) {
+      setProductActionError(
+        deleteError || "Не удалось удалить продукт. Попробуйте еще раз.",
+      );
+    }
   };
 
   if (isInitialLoading) {
@@ -81,6 +191,25 @@ const OrdersPage = () => {
         <ArrivalsList orders={orders} onDeleteOrder={handleOpenDeleteModal} />
       ) : (
         <EmptyState message="Приходы не найдены." />
+      )}
+
+      {productActionError && !isProductModalOpen && (
+        <p className="orders-page__action-error">{productActionError}</p>
+      )}
+
+      {isProductModalOpen && (
+        <AddProductModal
+          key={`${productModalMode}-${getProductRequestId(editingProduct) ?? "new"}`}
+          isOpen={isProductModalOpen}
+          isLoading={isLoading}
+          mode={productModalMode}
+          orderLinkId={orderLinkId}
+          orderTitle={activeSelectedOrderDetails?.title}
+          product={editingProduct}
+          error={productActionError}
+          onClose={handleCloseAddProductModal}
+          onSubmit={handleSaveProduct}
+        />
       )}
 
       <DeleteOrderModal
