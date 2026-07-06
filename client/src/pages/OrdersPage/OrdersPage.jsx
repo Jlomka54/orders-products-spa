@@ -85,7 +85,7 @@ const OrdersPage = () => {
   }
 
   return (
-    <section className="orders-page">
+    <section className="orders-page orders-page--arrivals">
       <header className="orders-page__header">
         <button
           className="orders-page__add-button"
