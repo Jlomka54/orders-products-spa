@@ -47,7 +47,6 @@ export const createEmptyProductForm = () => ({
   legacyId: "",
   serialNumber: "",
   isNew: false,
-  photo: "",
   title: "",
   type: "",
   specification: "",
@@ -64,7 +63,6 @@ export const createProductFormFromProduct = (product) => ({
   legacyId: product?.legacyId ?? "",
   serialNumber: product?.serialNumber ?? "",
   isNew: product?.isNew ?? false,
-  photo: product?.photo ?? "",
   title: product?.title ?? "",
   type: product?.type ?? "",
   specification: product?.specification ?? "",
@@ -80,7 +78,6 @@ export const buildProductPayload = (form) => {
   const payload = {
     serialNumber: Number(form.serialNumber),
     isNew: Boolean(form.isNew),
-    photo: form.photo,
     title: form.title,
     type: form.type,
     specification: form.specification,

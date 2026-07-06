@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "seed:products": "node seed/products.js"
+    "seed:products": "node seed/products.js",
+    "fix:order-legacy-ids": "node seed/backfillOrderLegacyIds.js"
   },
   "keywords": [],
   "author": "",
