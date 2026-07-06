@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "@vercel/node": "latest"
+  }
+}

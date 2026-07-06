@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const httpClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -86,11 +86,8 @@ httpClient.interceptors.request.use((config) => {
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = getResponseMessage(error);
-    const normalizedError = new Error(message);
-
-    normalizedError.status = error.response?.status;
-    normalizedError.fields = error.response?.data?.fields ?? [];
+    const message =
+      error.response?.data?.message || error.message || "Something went wrong";
 
     return Promise.reject(normalizedError);
   },

@@ -51,3 +51,35 @@ export const normalizeOrder = (order) => {
     clientId: orderId === null ? null : String(orderId),
   };
 };
+
+const hasFormValue = (value) =>
+  value !== null && value !== undefined && String(value).trim() !== "";
+
+export const createEmptyOrderForm = () => ({
+  legacyId: "",
+  title: "",
+  date: "",
+  description: "",
+});
+
+export const createOrderFormFromOrder = (order) => ({
+  ...createEmptyOrderForm(),
+  legacyId: order?.legacyId ?? "",
+  title: order?.title ?? "",
+  date: order?.date ?? "",
+  description: order?.description ?? "",
+});
+
+export const buildOrderPayload = (form) => {
+  const payload = {
+    title: form.title,
+    date: form.date,
+    description: form.description,
+  };
+
+  if (hasFormValue(form.legacyId)) {
+    payload.legacyId = Number(form.legacyId);
+  }
+
+  return payload;
+};

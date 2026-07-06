@@ -1,36 +1,26 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import EmptyState from "../../components/ui/EmptyState";
+import ErrorMessage from "../../components/ui/ErrorMessage";
+import Loader from "../../components/ui/Loader";
+import ArrivalsList from "../../features/arrivals/components/ArrivalsList";
+import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
 import {
   selectDeleteModalOrder,
   selectDeleteModalOrderId,
   selectOrders,
   selectOrdersError,
   selectOrdersLoading,
-  selectSelectedOrderId,
-  selectSelectedOrderDetails,
+  selectOrdersMutationLoading,
 } from "../../features/orders/ordersSelectors";
 import {
   addProductToOrder,
   closeDeleteModal,
-  fetchOrderById,
   fetchOrders,
   openDeleteModal,
   removeProductFromOrder,
   removeOrder,
-  setSelectedOrderId,
-  updateProductInOrder,
 } from "../../features/orders/ordersSlice";
-import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
-import AddProductModal from "../../features/orders/components/AddProductModal";
-import OrderDetailsPanel from "../../features/orders/components/OrderDetailsPanel";
-import OrdersList from "../../features/orders/components/OrdersList";
-import EmptyState from "../../components/ui/EmptyState";
-import ErrorMessage from "../../components/ui/ErrorMessage";
-import Loader from "../../components/ui/Loader";
-import {
-  getOrderId,
-  isSameOrder,
-} from "../../utils/orderHelpers";
 import "./OrdersPage.css";
 
 const OrdersPage = () => {
@@ -41,17 +31,10 @@ const OrdersPage = () => {
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
-  const selectedOrderId = useSelector(selectSelectedOrderId);
-  const selectedOrderDetails = useSelector(selectSelectedOrderDetails);
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
   const isProductModalOpen = productModalMode !== null;
 
-  const selectedDetailsId = getOrderId(selectedOrderDetails);
-  const activeSelectedOrderDetails =
-    isSameOrder(selectedDetailsId, selectedOrderId)
-      ? selectedOrderDetails
-      : null;
   const hasOrders = orders.length > 0;
   const isInitialLoading = isLoading && !hasOrders;
   const hasBlockingError = error && !hasOrders;
@@ -66,11 +49,6 @@ const OrdersPage = () => {
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
-
-  const handleOrderClick = (orderId) => {
-    dispatch(setSelectedOrderId(orderId));
-    dispatch(fetchOrderById(orderId));
-  };
 
   const handleOpenDeleteModal = (orderId) => {
     dispatch(openDeleteModal(orderId));
@@ -186,58 +164,34 @@ const OrdersPage = () => {
   };
 
   if (isInitialLoading) {
-    return <Loader text="Loading orders..." />;
+    return <Loader text="Загрузка приходов..." />;
   }
 
   if (hasBlockingError) {
-    return <ErrorMessage message={`Failed to load orders: ${error}`} />;
-  }
-
-  if (!hasOrders) {
-    return <EmptyState message="No orders found." />;
+    return <ErrorMessage message={`Не удалось загрузить приходы: ${error}`} />;
   }
 
   return (
-    <section className="orders-page">
+    <section className="orders-page orders-page--arrivals">
       <header className="orders-page__header">
-        <button
-          className="orders-page__add-button"
-          type="button"
-          aria-label="Добавить приход"
-        >
-          +
-        </button>
         <h1 className="orders-page__heading">Приходы / {orders.length}</h1>
       </header>
 
       {(error || isLoading) && (
         <div className="orders-page__status">
           {error && (
-            <ErrorMessage message={`Failed to load orders: ${error}`} />
+            <ErrorMessage message={`Не удалось загрузить приходы: ${error}`} />
           )}
 
-          {isLoading && (
-            <Loader text="Loading orders..." />
-          )}
+          {isLoading && <Loader text="Загрузка приходов..." />}
         </div>
       )}
 
-      <div className="orders-page__content">
-        <OrdersList
-          orders={orders}
-          selectedOrderId={selectedOrderId}
-          onOrderSelect={handleOrderClick}
-          onDeleteOrder={handleOpenDeleteModal}
-        />
-
-        <OrderDetailsPanel
-          selectedOrderDetails={activeSelectedOrderDetails}
-          onAddProduct={handleOpenAddProductModal}
-          onEditProduct={handleOpenEditProductModal}
-          onDeleteProduct={handleDeleteProduct}
-          isLoading={isLoading}
-        />
-      </div>
+      {hasOrders ? (
+        <ArrivalsList orders={orders} onDeleteOrder={handleOpenDeleteModal} />
+      ) : (
+        <EmptyState message="Приходы не найдены." />
+      )}
 
       {productActionError && !isProductModalOpen && (
         <p className="orders-page__action-error">{productActionError}</p>

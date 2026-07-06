@@ -1,28 +1,42 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import EmptyState from "../../components/ui/EmptyState";
+import ErrorMessage from "../../components/ui/ErrorMessage";
+import Loader from "../../components/ui/Loader";
+import DeleteProductModal from "../../features/products/components/DeleteProductModal";
+import ProductFormModal from "../../features/products/components/ProductFormModal";
+import ProductsFilters from "../../features/products/components/ProductsFilters";
+import ProductsList from "../../features/products/components/ProductsList";
 import {
+  selectDeleteModalProduct,
+  selectDeleteModalProductId,
+  selectEditingProduct,
   selectFilteredProducts,
+  selectProductFormMode,
+  selectProductFormOpen,
   selectProducts,
   selectProductsError,
   selectProductsLoading,
+  selectProductsMutationLoading,
   selectProductSpecifications,
   selectProductTypes,
   selectSelectedSpecification,
   selectSelectedType,
 } from "../../features/products/productsSelectors";
 import {
+  closeDeleteProductModal,
+  closeProductFormModal,
+  createProduct,
   fetchProducts,
+  openCreateProductModal,
+  openDeleteProductModal,
+  openEditProductModal,
   removeProduct,
   setSelectedSpecification,
   setSelectedType,
   updateProduct,
 } from "../../features/products/productsSlice";
-import AddProductModal from "../../features/orders/components/AddProductModal";
-import EmptyState from "../../components/ui/EmptyState";
-import ErrorMessage from "../../components/ui/ErrorMessage";
-import Loader from "../../components/ui/Loader";
-import ProductsFilters from "../../features/products/components/ProductsFilters";
-import ProductsList from "../../features/products/components/ProductsList";
+import { getProductRequestId } from "../../utils/productHelpers";
 import "./ProductsPage.css";
 
 export const ProductsPage = () => {
@@ -37,7 +51,12 @@ export const ProductsPage = () => {
   const selectedSpecification = useSelector(selectSelectedSpecification);
   const productTypes = useSelector(selectProductTypes);
   const productSpecifications = useSelector(selectProductSpecifications);
-  const isProductModalOpen = editingProduct !== null;
+  const isProductFormOpen = useSelector(selectProductFormOpen);
+  const productFormMode = useSelector(selectProductFormMode);
+  const editingProduct = useSelector(selectEditingProduct);
+  const deleteModalProductId = useSelector(selectDeleteModalProductId);
+  const deleteModalProduct = useSelector(selectDeleteModalProduct);
+  const mutationLoading = useSelector(selectProductsMutationLoading);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -51,75 +70,42 @@ export const ProductsPage = () => {
     dispatch(setSelectedSpecification(event.target.value));
   };
 
-  const getProductRequestId = (product) => product?._id ?? product?.id ?? null;
-
-  const getProductOrderLinkId = (product) => {
-    const rawOrderLinkId =
-      product?.order?.legacyId ?? product?.order?.id ?? product?.order;
-    const numericOrderLinkId = Number(rawOrderLinkId);
-
-    return Number.isFinite(numericOrderLinkId) ? numericOrderLinkId : null;
+  const handleOpenCreateProductModal = () => {
+    dispatch(openCreateProductModal());
   };
 
   const handleOpenEditProductModal = (product) => {
-    setProductActionError("");
-    setEditingProduct(product);
+    dispatch(openEditProductModal(product));
   };
 
-  const handleCloseEditProductModal = () => {
-    if (isLoading) {
+  const handleCloseProductFormModal = () => {
+    dispatch(closeProductFormModal());
+  };
+
+  const handleOpenDeleteProductModal = (productId) => {
+    dispatch(openDeleteProductModal(productId));
+  };
+
+  const handleCloseDeleteProductModal = () => {
+    dispatch(closeDeleteProductModal());
+  };
+
+  const handleProductSubmit = (payload) => {
+    if (productFormMode === "create") {
+      dispatch(createProduct(payload));
       return;
     }
 
-    setEditingProduct(null);
-    setProductActionError("");
-  };
-
-  const handleSaveProduct = async (product) => {
     const productId = getProductRequestId(editingProduct);
 
-    if (productId === null || productId === undefined) {
-      setProductActionError("Не удалось определить ID продукта для редактирования.");
-      return;
-    }
-
-    setProductActionError("");
-
-    try {
-      await dispatch(
-        updateProduct({
-          productId,
-          product,
-        }),
-      ).unwrap();
-      setEditingProduct(null);
-    } catch (submitError) {
-      setProductActionError(
-        submitError || "Не удалось сохранить продукт. Попробуйте еще раз.",
-      );
+    if (productId !== null && productId !== undefined) {
+      dispatch(updateProduct({ productId, productPayload: payload }));
     }
   };
 
-  const handleDeleteProduct = async (product) => {
-    const productId = getProductRequestId(product);
-
-    if (productId === null || productId === undefined) {
-      setProductActionError("Не удалось определить ID продукта для удаления.");
-      return;
-    }
-
-    if (!window.confirm(`Удалить продукт "${product.title}"?`)) {
-      return;
-    }
-
-    setProductActionError("");
-
-    try {
-      await dispatch(removeProduct(productId)).unwrap();
-    } catch (deleteError) {
-      setProductActionError(
-        deleteError || "Не удалось удалить продукт. Попробуйте еще раз.",
-      );
+  const handleProductDelete = () => {
+    if (deleteModalProductId !== null && deleteModalProductId !== undefined) {
+      dispatch(removeProduct(deleteModalProductId));
     }
   };
 
@@ -131,16 +117,18 @@ export const ProductsPage = () => {
     return <ErrorMessage message={`Failed to load products: ${error}`} />;
   }
 
-  if (products.length === 0) {
-    return <EmptyState message="No products found." />;
-  }
-
   return (
     <section className="products-page">
       <header className="products-page__header">
-        <h1 className="products-page__heading">
-          Продукты / {products.length}
-        </h1>
+        <h1 className="products-page__heading">Продукты / {products.length}</h1>
+
+        <button
+          className="products-page__add-button"
+          type="button"
+          onClick={handleOpenCreateProductModal}
+        >
+          + Добавить продукт
+        </button>
 
         <ProductsFilters
           productTypes={productTypes}
@@ -153,42 +141,47 @@ export const ProductsPage = () => {
       </header>
 
       {error && (
-        <ErrorMessage message={`Failed to load products: ${error}`} />
+        <ErrorMessage message={`Не удалось загрузить продукты: ${error}`} />
       )}
 
-      {productActionError && !isProductModalOpen && (
-        <ErrorMessage message={productActionError} />
-      )}
-
-      {isLoading && (
-        <Loader text="Loading products..." />
-      )}
+      {isLoading && <Loader text="Загрузка продуктов..." />}
 
       {filteredProducts.length === 0 ? (
-        <EmptyState message="No products match filters." />
+        <EmptyState
+          message={
+            products.length === 0
+              ? "Продукты не найдены."
+              : "Нет продуктов, соответствующих фильтрам."
+          }
+        />
       ) : (
         <ProductsList
           products={filteredProducts}
-          isLoading={isLoading}
           onEditProduct={handleOpenEditProductModal}
-          onDeleteProduct={handleDeleteProduct}
+          onDeleteProduct={handleOpenDeleteProductModal}
         />
       )}
 
-      {isProductModalOpen && (
-        <AddProductModal
-          key={`edit-${getProductRequestId(editingProduct)}`}
-          isOpen={isProductModalOpen}
-          isLoading={isLoading}
-          mode="edit"
-          orderLinkId={getProductOrderLinkId(editingProduct)}
-          orderTitle={editingProduct?.orderTitle}
-          product={editingProduct}
-          error={productActionError}
-          onClose={handleCloseEditProductModal}
-          onSubmit={handleSaveProduct}
-        />
-      )}
+      <ProductFormModal
+        isOpen={isProductFormOpen}
+        mode={productFormMode}
+        product={editingProduct}
+        isLoading={mutationLoading}
+        productTypes={productTypes}
+        productSpecifications={productSpecifications}
+        onClose={handleCloseProductFormModal}
+        onSubmit={handleProductSubmit}
+      />
+
+      <DeleteProductModal
+        product={deleteModalProduct}
+        isOpen={
+          deleteModalProductId !== null && deleteModalProductId !== undefined
+        }
+        isLoading={mutationLoading}
+        onClose={handleCloseDeleteProductModal}
+        onConfirm={handleProductDelete}
+      />
     </section>
   );
 };

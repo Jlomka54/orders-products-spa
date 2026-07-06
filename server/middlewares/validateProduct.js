@@ -1,6 +1,5 @@
 const requiredProductFields = [
   "serialNumber",
-  "photo",
   "title",
   "type",
   "specification",
@@ -10,7 +9,8 @@ const requiredProductFields = [
   "date",
 ];
 
-const isMissing = (value) => value === undefined || value === null || value === "";
+const isMissing = (value) =>
+  value === undefined || value === null || value === "";
 
 const toBoolean = (value) => {
   if (typeof value === "boolean") {
@@ -54,7 +54,9 @@ const hasValidDate = (value) => !Number.isNaN(Date.parse(value));
 
 export const validateProduct = (req, res, next) => {
   const payload = normalizeProductPayload(req.body ?? {});
-  const missingFields = requiredProductFields.filter((field) => isMissing(payload[field]));
+  const missingFields = requiredProductFields.filter((field) =>
+    isMissing(payload[field]),
+  );
 
   if (missingFields.length > 0) {
     return res.status(400).json({
@@ -99,7 +101,8 @@ export const validateProduct = (req, res, next) => {
 
   if (hasInvalidPrice) {
     return res.status(400).json({
-      message: "Each price must include a non-negative value and currency symbol",
+      message:
+        "Each price must include a non-negative value and currency symbol",
     });
   }
 

@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  createOrderApi,
   deleteOrderApi,
   getOrderByIdApi,
   getOrdersWithDetailsApi,
+  updateOrderApi,
 } from "../../api/ordersApi";
 import {
   createProductApi,
@@ -31,6 +33,35 @@ export const fetchOrderById = createAsyncThunk(
   async (orderId, { rejectWithValue }) => {
     try {
       return await getOrderByIdApi(orderId);
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const createOrder = createAsyncThunk(
+  "orders/createOrder",
+  async (orderPayload, { rejectWithValue }) => {
+    try {
+      const response = await createOrderApi(orderPayload);
+
+      return response.order || response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const updateOrder = createAsyncThunk(
+  "orders/updateOrder",
+  async ({ orderId, orderPayload }, { rejectWithValue }) => {
+    try {
+      const response = await updateOrderApi(orderId, orderPayload);
+
+      return {
+        orderId,
+        order: response.order || response,
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -106,7 +137,11 @@ const initialState = {
   selectedOrderId: null,
   selectedOrderDetails: null,
   deleteModalOrderId: null,
+  isOrderFormOpen: false,
+  orderFormMode: "create",
+  editingOrder: null,
   isLoading: false,
+  mutationLoading: false,
   error: null,
 };
 
@@ -120,21 +155,14 @@ const setRejectedState = (state, action) => {
   state.error = action.payload || action.error.message || "Orders request failed";
 };
 
-const updateOrderDetailsState = (state, action) => {
-  const { orderId, selectedOrderDetails } = action.payload;
-  const normalizedOrderDetails = normalizeOrder(selectedOrderDetails);
-
-  state.selectedOrderDetails = normalizedOrderDetails;
-  state.items = state.items.map((order) =>
-    isSameOrder(getOrderId(order), orderId)
-      ? {
-          ...order,
-          ...normalizedOrderDetails,
-        }
-      : order,
-  );
-  state.isLoading = false;
+const setMutationPendingState = (state) => {
+  state.mutationLoading = true;
   state.error = null;
+};
+
+const setMutationRejectedState = (state, action) => {
+  state.mutationLoading = false;
+  state.error = action.payload || action.error.message || "Orders request failed";
 };
 
 const ordersSlice = createSlice({
@@ -153,6 +181,20 @@ const ordersSlice = createSlice({
     },
     closeDeleteModal: (state) => {
       state.deleteModalOrderId = null;
+    },
+    openCreateOrderModal: (state) => {
+      state.isOrderFormOpen = true;
+      state.orderFormMode = "create";
+      state.editingOrder = null;
+    },
+    openEditOrderModal: (state, action) => {
+      state.isOrderFormOpen = true;
+      state.orderFormMode = "edit";
+      state.editingOrder = action.payload;
+    },
+    closeOrderFormModal: (state) => {
+      state.isOrderFormOpen = false;
+      state.editingOrder = null;
     },
   },
   extraReducers: (builder) => {
@@ -193,15 +235,41 @@ const ordersSlice = createSlice({
         }
       })
       .addCase(removeOrder.rejected, setRejectedState)
-      .addCase(addProductToOrder.pending, setPendingState)
-      .addCase(addProductToOrder.fulfilled, updateOrderDetailsState)
-      .addCase(addProductToOrder.rejected, setRejectedState)
-      .addCase(updateProductInOrder.pending, setPendingState)
-      .addCase(updateProductInOrder.fulfilled, updateOrderDetailsState)
-      .addCase(updateProductInOrder.rejected, setRejectedState)
-      .addCase(removeProductFromOrder.pending, setPendingState)
-      .addCase(removeProductFromOrder.fulfilled, updateOrderDetailsState)
-      .addCase(removeProductFromOrder.rejected, setRejectedState);
+      .addCase(createOrder.pending, setMutationPendingState)
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.items.push(normalizeOrder(action.payload));
+        state.isOrderFormOpen = false;
+        state.editingOrder = null;
+        state.mutationLoading = false;
+        state.error = null;
+      })
+      .addCase(createOrder.rejected, setMutationRejectedState)
+      .addCase(updateOrder.pending, setMutationPendingState)
+      .addCase(updateOrder.fulfilled, (state, action) => {
+        const updatedOrderId = action.payload.orderId;
+        const updatedOrder = normalizeOrder(action.payload.order);
+
+        state.items = state.items.map((order) =>
+          isSameOrder(getOrderId(order), updatedOrderId)
+            ? updatedOrder
+            : order,
+        );
+
+        if (
+          isSameOrder(
+            getOrderId(state.selectedOrderDetails),
+            updatedOrderId,
+          )
+        ) {
+          state.selectedOrderDetails = updatedOrder;
+        }
+
+        state.isOrderFormOpen = false;
+        state.editingOrder = null;
+        state.mutationLoading = false;
+        state.error = null;
+      })
+      .addCase(updateOrder.rejected, setMutationRejectedState);
   },
 });
 
@@ -210,6 +278,9 @@ export const {
   clearSelectedOrder,
   openDeleteModal,
   closeDeleteModal,
+  openCreateOrderModal,
+  openEditOrderModal,
+  closeOrderFormModal,
 } = ordersSlice.actions;
 
 export default ordersSlice.reducer;

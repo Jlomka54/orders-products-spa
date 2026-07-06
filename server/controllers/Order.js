@@ -5,7 +5,8 @@ import Product from "../models/Product.js";
 
 const isNumeric = (value) => value !== "" && !Number.isNaN(Number(value));
 
-const hasValidOrderIdentifier = (id) => mongoose.isValidObjectId(id) || isNumeric(id);
+const hasValidOrderIdentifier = (id) =>
+  mongoose.isValidObjectId(id) || isNumeric(id);
 
 const getDuplicateField = (error) => {
   return Object.keys(error.keyPattern ?? error.keyValue ?? {})[0];
@@ -64,8 +65,11 @@ export const getOrderById = async (req, res) => {
       : [];
     const productOrderId = orderObject.legacyId ?? orderObject.id;
     const linkedProducts =
-      productOrderId === undefined ? [] : await Product.find({ order: productOrderId });
-    const products = linkedProducts.length > 0 ? linkedProducts : embeddedProducts;
+      productOrderId === undefined
+        ? []
+        : await Product.find({ order: productOrderId });
+    const products =
+      linkedProducts.length > 0 ? linkedProducts : embeddedProducts;
 
     return res.json({
       ...orderObject,
@@ -120,14 +124,10 @@ export const updateOrder = async (req, res) => {
           runValidators: true,
         }),
       byLegacyId: (legacyId) =>
-        Order.findOneAndUpdate(
-          { legacyId },
-          req.body,
-          {
-            new: true,
-            runValidators: true,
-          },
-        ),
+        Order.findOneAndUpdate({ legacyId }, req.body, {
+          new: true,
+          runValidators: true,
+        }),
     });
 
     if (!order) {

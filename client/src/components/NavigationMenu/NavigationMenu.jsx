@@ -22,9 +22,9 @@ const NavigationMenu = () => {
         <NavLink className={getNavLinkClassName} to="/orders">
           ПРИХОД
         </NavLink>
-        <span className="navigation-menu__link navigation-menu__link--static">
+        <NavLink className={getNavLinkClassName} to="/groups">
           ГРУППЫ
-        </span>
+        </NavLink>
         <NavLink className={getNavLinkClassName} to="/products">
           ПРОДУКТЫ
         </NavLink>

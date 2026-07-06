@@ -12,14 +12,14 @@ export const getProductByIdApi = async (productId) => {
   return response.data;
 };
 
-export const createProductApi = async (product) => {
-  const response = await httpClient.post("/products", product);
+export const createProductApi = async (productData) => {
+  const response = await httpClient.post("/products", productData);
 
   return response.data;
 };
 
-export const updateProductApi = async (productId, product) => {
-  const response = await httpClient.put(`/products/${productId}`, product);
+export const updateProductApi = async (productId, productData) => {
+  const response = await httpClient.put(`/products/${productId}`, productData);
 
   return response.data;
 };
