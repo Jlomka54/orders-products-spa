@@ -4,6 +4,7 @@ import {
   getOrderByIdApi,
   getOrdersWithDetailsApi,
 } from "../../api/ordersApi";
+import { createProductApi } from "../../api/productsApi";
 import {
   getOrderId,
   isSameOrder,
@@ -41,6 +42,22 @@ export const removeOrder = createAsyncThunk(
       return {
         orderId,
         response,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const addProductToOrder = createAsyncThunk(
+  "orders/addProductToOrder",
+  async ({ orderId, product }, { rejectWithValue }) => {
+    try {
+      await createProductApi(product);
+
+      return {
+        orderId,
+        selectedOrderDetails: await getOrderByIdApi(orderId),
       };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -122,7 +139,25 @@ const ordersSlice = createSlice({
           state.selectedOrderDetails = null;
         }
       })
-      .addCase(removeOrder.rejected, setRejectedState);
+      .addCase(removeOrder.rejected, setRejectedState)
+      .addCase(addProductToOrder.pending, setPendingState)
+      .addCase(addProductToOrder.fulfilled, (state, action) => {
+        const { orderId, selectedOrderDetails } = action.payload;
+        const normalizedOrderDetails = normalizeOrder(selectedOrderDetails);
+
+        state.selectedOrderDetails = normalizedOrderDetails;
+        state.items = state.items.map((order) =>
+          isSameOrder(getOrderId(order), orderId)
+            ? {
+                ...order,
+                ...normalizedOrderDetails,
+              }
+            : order,
+        );
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(addProductToOrder.rejected, setRejectedState);
   },
 });
 

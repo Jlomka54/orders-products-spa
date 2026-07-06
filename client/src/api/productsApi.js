@@ -11,3 +11,9 @@ export const getProductByIdApi = async (productId) => {
 
   return response.data;
 };
+
+export const createProductApi = async (product) => {
+  const response = await httpClient.post("/products", product);
+
+  return response.data;
+};

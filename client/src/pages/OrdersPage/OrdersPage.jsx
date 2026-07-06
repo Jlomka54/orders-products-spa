@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectDeleteModalOrder,
@@ -10,6 +10,7 @@ import {
   selectSelectedOrderDetails,
 } from "../../features/orders/ordersSelectors";
 import {
+  addProductToOrder,
   closeDeleteModal,
   fetchOrderById,
   fetchOrders,
@@ -18,6 +19,7 @@ import {
   setSelectedOrderId,
 } from "../../features/orders/ordersSlice";
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
+import AddProductModal from "../../features/orders/components/AddProductModal";
 import OrderDetailsPanel from "../../features/orders/components/OrderDetailsPanel";
 import OrdersList from "../../features/orders/components/OrdersList";
 import EmptyState from "../../components/ui/EmptyState";
@@ -31,6 +33,8 @@ import "./OrdersPage.css";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [addProductError, setAddProductError] = useState("");
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
@@ -47,6 +51,13 @@ const OrdersPage = () => {
   const hasOrders = orders.length > 0;
   const isInitialLoading = isLoading && !hasOrders;
   const hasBlockingError = error && !hasOrders;
+  const orderLinkId = (() => {
+    const rawOrderLinkId =
+      activeSelectedOrderDetails?.legacyId ?? activeSelectedOrderDetails?.id;
+    const numericOrderLinkId = Number(rawOrderLinkId);
+
+    return Number.isFinite(numericOrderLinkId) ? numericOrderLinkId : null;
+  })();
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -71,6 +82,42 @@ const OrdersPage = () => {
     }
 
     dispatch(removeOrder(deleteModalOrderId));
+  };
+
+  const handleOpenAddProductModal = () => {
+    setAddProductError("");
+    setIsAddProductModalOpen(true);
+  };
+
+  const handleCloseAddProductModal = () => {
+    if (isLoading) {
+      return;
+    }
+
+    setIsAddProductModalOpen(false);
+    setAddProductError("");
+  };
+
+  const handleAddProduct = async (product) => {
+    if (selectedOrderId === null || selectedOrderId === undefined) {
+      return;
+    }
+
+    setAddProductError("");
+
+    try {
+      await dispatch(
+        addProductToOrder({
+          orderId: selectedOrderId,
+          product,
+        }),
+      ).unwrap();
+      setIsAddProductModalOpen(false);
+    } catch (submitError) {
+      setAddProductError(
+        submitError || "Не удалось добавить продукт. Попробуйте еще раз.",
+      );
+    }
   };
 
   if (isInitialLoading) {
@@ -118,8 +165,23 @@ const OrdersPage = () => {
           onDeleteOrder={handleOpenDeleteModal}
         />
 
-        <OrderDetailsPanel selectedOrderDetails={activeSelectedOrderDetails} />
+        <OrderDetailsPanel
+          selectedOrderDetails={activeSelectedOrderDetails}
+          onAddProduct={handleOpenAddProductModal}
+        />
       </div>
+
+      {isAddProductModalOpen && (
+        <AddProductModal
+          isOpen={isAddProductModalOpen}
+          isLoading={isLoading}
+          orderLinkId={orderLinkId}
+          orderTitle={activeSelectedOrderDetails?.title}
+          error={addProductError}
+          onClose={handleCloseAddProductModal}
+          onSubmit={handleAddProduct}
+        />
+      )}
 
       <DeleteOrderModal
         deleteModalOrderId={deleteModalOrderId}

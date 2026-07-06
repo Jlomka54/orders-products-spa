@@ -21,7 +21,7 @@ const DetailProductPhoto = ({ product }) => {
   );
 };
 
-const OrderDetailsPanel = ({ selectedOrderDetails }) => {
+const OrderDetailsPanel = ({ selectedOrderDetails, onAddProduct }) => {
   if (!selectedOrderDetails) {
     return null;
   }
@@ -34,7 +34,11 @@ const OrderDetailsPanel = ({ selectedOrderDetails }) => {
         <h2 className="orders-page__details-title">
           {selectedOrderDetails.title}
         </h2>
-        <button className="orders-page__details-add" type="button">
+        <button
+          className="orders-page__details-add"
+          type="button"
+          onClick={onAddProduct}
+        >
           <span aria-hidden="true">+</span>
           Добавить продукт
         </button>
