@@ -209,7 +209,6 @@
 .orders-page__delete-button,
 .orders-page__details-product-delete,
 .products-page__delete-button {
-  position: relative;
   display: grid;
   width: 38px;
   height: 38px;
@@ -220,27 +219,10 @@
   cursor: pointer;
 }
 
-.orders-page__delete-button::before,
-.orders-page__details-product-delete::before,
-.products-page__delete-button::before {
-  width: 10px;
-  height: 12px;
-  border: 2px solid currentColor;
-  border-top: 0;
-  border-radius: 0 0 2px 2px;
-  content: "";
-}
-
-.orders-page__delete-button::after,
-.orders-page__details-product-delete::after,
-.products-page__delete-button::after {
-  position: absolute;
-  top: 11px;
-  width: 14px;
-  height: 2px;
-  border-radius: 2px;
-  background: currentColor;
-  content: "";
+.orders-page__delete-button svg,
+.orders-page__details-product-delete svg,
+.products-page__delete-button svg {
+  display: block;
 }
 
 .orders-page__delete-button:hover,

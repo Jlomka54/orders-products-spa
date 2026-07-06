@@ -1,7 +1,27 @@
+import mongoose from "mongoose";
 import Product from "../models/Product.js";
+import Order from "../models/Order.js";
 
 const getDuplicateField = (error) => {
   return Object.keys(error.keyPattern ?? error.keyValue ?? {})[0];
+};
+
+const isNumeric = (value) => value !== "" && !Number.isNaN(Number(value));
+
+const removeEmbeddedProductFromOrders = async (productId) => {
+  if (productId === null || productId === undefined) {
+    return;
+  }
+
+  await Order.updateMany(
+    { "products.id": productId },
+    { $pull: { products: { id: productId } } },
+  );
+
+  await Order.updateMany(
+    { "products.legacyId": productId },
+    { $pull: { products: { legacyId: productId } } },
+  );
 };
 
 export const getProducts = async (req, res) => {
@@ -110,13 +130,24 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    let product = null;
+
+    if (mongoose.isValidObjectId(id)) {
+      product = await Product.findByIdAndDelete(id);
+    }
+
+    if (!product && isNumeric(id)) {
+      product = await Product.findOneAndDelete({ legacyId: Number(id) });
+    }
 
     if (!product) {
       return res.status(404).json({
         message: "Product not found",
       });
     }
+
+    await removeEmbeddedProductFromOrders(product._id ?? product.legacyId ?? product.id);
 
     return res.json({
       product,

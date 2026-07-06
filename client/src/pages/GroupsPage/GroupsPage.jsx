@@ -39,6 +39,7 @@ import {
   closeProductFormModal,
   createProduct,
   openCreateProductModal,
+  removeProduct,
 } from "../../features/products/productsSlice";
 import {
   getOrderId,
@@ -119,6 +120,16 @@ const GroupsPage = () => {
     dispatch(closeProductFormModal());
   };
 
+  const handleDeleteProduct = async (productId) => {
+    if (productId !== null && productId !== undefined) {
+      const result = await dispatch(removeProduct(productId));
+
+      if (result?.meta?.requestStatus === "fulfilled" && selectedOrderId) {
+        dispatch(fetchOrderById(selectedOrderId));
+      }
+    }
+  };
+
   const handleProductSubmit = (payload) => {
     const productPayload = selectedOrderId
       ? { ...payload, order: Number(selectedOrderId) }
@@ -179,6 +190,7 @@ const GroupsPage = () => {
           <OrderDetailsPanel
             selectedOrderDetails={activeSelectedOrderDetails}
             onAddProduct={handleOpenCreateProductModal}
+            onDeleteProduct={handleDeleteProduct}
             onClose={handleCloseDetailsPanel}
           />
         </div>

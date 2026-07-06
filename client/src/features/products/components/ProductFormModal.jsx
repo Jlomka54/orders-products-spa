@@ -59,7 +59,17 @@ const ProductFormModalContent = ({
           <button
             className="product-form-modal__close-button"
             type="button"
-              aria-label="Закрыть форму продукта"
+            aria-label="Закрыть форму продукта"
+            onClick={onClose}
+            disabled={isLoading}
+          />
+        </div>
+
+        <form className="product-form-modal__form" onSubmit={handleSubmit}>
+          <label className="product-form-modal__field">
+            <span className="product-form-modal__label">Устаревший ID</span>
+            <input
+              className="product-form-modal__input"
               type="number"
               name="legacyId"
               value={form.legacyId}
@@ -69,7 +79,7 @@ const ProductFormModalContent = ({
           </label>
 
           <label className="product-form-modal__field">
-            <span className="product-form-modal__label">Title</span>
+            <span className="product-form-modal__label">Название</span>
             <input
               className="product-form-modal__input"
               type="text"

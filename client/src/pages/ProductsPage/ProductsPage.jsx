@@ -118,16 +118,19 @@ export const ProductsPage = () => {
   return (
     <section className="products-page">
       <header className="products-page__header">
-        <h1 className="products-page__heading">
-          Продукты / {products.length}
-        </h1>
+        <h1 className="products-page__heading">Продукты / {products.length}</h1>
 
         <button
           className="products-page__add-button"
           type="button"
           onClick={handleOpenCreateProductModal}
         >
-        + Добавить продукт
+          + Добавить продукт
+        </button>
+
+        <ProductsFilters
+          productTypes={productTypes}
+          productSpecifications={productSpecifications}
           selectedType={selectedType}
           selectedSpecification={selectedSpecification}
           onTypeChange={handleTypeChange}
@@ -139,9 +142,7 @@ export const ProductsPage = () => {
         <ErrorMessage message={`Не удалось загрузить продукты: ${error}`} />
       )}
 
-      {isLoading && (
-        <Loader text="Загрузка продуктов..." />
-      )}
+      {isLoading && <Loader text="Загрузка продуктов..." />}
 
       {filteredProducts.length === 0 ? (
         <EmptyState
@@ -170,7 +171,9 @@ export const ProductsPage = () => {
 
       <DeleteProductModal
         product={deleteModalProduct}
-        isOpen={deleteModalProductId !== null && deleteModalProductId !== undefined}
+        isOpen={
+          deleteModalProductId !== null && deleteModalProductId !== undefined
+        }
         isLoading={mutationLoading}
         onClose={handleCloseDeleteProductModal}
         onConfirm={handleProductDelete}
