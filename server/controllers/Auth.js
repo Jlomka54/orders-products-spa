@@ -6,6 +6,18 @@ const getDuplicateField = (error) => {
   return Object.keys(error.keyPattern ?? error.keyValue ?? {})[0];
 };
 
+const getMissingCredentialsMessage = (username, password) => {
+  if (!username && !password) {
+    return "Enter your name and password to continue";
+  }
+
+  if (!username) {
+    return "Enter your name to continue";
+  }
+
+  return "Enter your password to continue";
+};
+
 const toPublicUser = (user) => {
   const publicUser = user.toObject();
   delete publicUser.password;
@@ -19,7 +31,7 @@ const ensureJwtSecret = (res) => {
   }
 
   res.status(500).json({
-    message: "Auth service is not configured",
+    message: "Authentication is temporarily unavailable. Please try again later",
   });
 
   return false;
@@ -34,7 +46,13 @@ export const register = async (req, res) => {
 
     if (!username || !password) {
       return res.status(400).json({
-        message: "Username and password are required",
+        message: getMissingCredentialsMessage(username, password),
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
       });
     }
 
@@ -45,7 +63,7 @@ export const register = async (req, res) => {
     const isUsed = await User.findOne({ username });
     if (isUsed) {
       return res.status(409).json({
-        message: "This username is already taken",
+        message: "This name is already in use. Try another one",
       });
     }
 
@@ -78,19 +96,19 @@ export const register = async (req, res) => {
 
       if (duplicateField === "username") {
         return res.status(409).json({
-          message: "This username is already taken",
+          message: "This name is already in use. Try another one",
         });
       }
 
       return res.status(409).json({
         message: duplicateField
-          ? `This ${duplicateField} is already taken`
-          : "Duplicate value already exists",
+          ? `This ${duplicateField} is already in use. Try another one`
+          : "This value is already in use. Try another one",
       });
     }
 
     return res.status(500).json({
-      message: "Registration failed",
+      message: "We couldn't create your account right now. Please try again later",
     });
   }
 };
@@ -103,7 +121,7 @@ export const login = async (req, res) => {
 
     if (!username || !password) {
       return res.status(400).json({
-        message: "Username and password are required",
+        message: getMissingCredentialsMessage(username, password),
       });
     }
 
@@ -114,14 +132,14 @@ export const login = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-      return res.status(400).json({
-        message: "That user does not exist",
+      return res.status(404).json({
+        message: "We couldn't find an account with this name",
       });
     }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
-      return res.status(400).json({
-        message: "The password or login is incorrect",
+      return res.status(401).json({
+        message: "Incorrect password. Please try again",
       });
     }
 
@@ -140,8 +158,9 @@ export const login = async (req, res) => {
         message: "You have successfully logged in",
       });
   } catch (error) {
+    console.error("Login error:", error);
     return res.status(500).json({
-      message: "Login failed",
+      message: "We couldn't sign you in right now. Please try again later",
     });
   }
 };
@@ -154,8 +173,8 @@ export const getMe = async (req, res) => {
 
     const user = await User.findById(req.userId);
     if (!user) {
-      return res.status(400).json({
-        message: "That user does not exist",
+      return res.status(404).json({
+        message: "Your account was not found. Please sign in again",
       });
     }
     const token = jwt.sign(
@@ -170,8 +189,9 @@ export const getMe = async (req, res) => {
       token,
     });
   } catch (error) {
-    return res.json({
-      message: "No access",
+    console.error("Get current user error:", error);
+    return res.status(401).json({
+      message: "Your session could not be verified. Please sign in again",
     });
   }
 };

@@ -9,12 +9,12 @@ export const checkToken = (req, res, next) => {
       next();
     } catch (error) {
       return res.status(400).json({
-        message: "No access",
+        message: "Your session has expired. Please sign in again",
       });
     }
   } else {
     return res.status(400).json({
-      message: "No access",
+      message: "Please sign in to continue",
     });
   }
 };
