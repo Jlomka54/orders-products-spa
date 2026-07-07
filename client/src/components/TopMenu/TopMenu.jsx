@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { selectIsAuthenticated } from "../../features/auth/authSelectors";
 import { logout } from "../../features/auth/authSlice";
+import { selectOrders } from "../../features/orders/ordersSelectors";
+import { fetchOrders } from "../../features/orders/ordersSlice";
+import { selectProducts } from "../../features/products/productsSelectors";
+import { fetchProducts } from "../../features/products/productsSlice";
 import {
   clearSearchQuery,
   closeSearch,
@@ -31,9 +36,14 @@ const formatTime = (date) =>
 const TopMenu = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const activeSessions = useSelector((state) => state.ui.activeSessions);
   const searchQuery = useSelector(selectSearchQuery);
+  const orders = useSelector(selectOrders);
+  const products = useSelector(selectProducts);
   const searchRef = useRef(null);
+  const hasRequestedOrders = useRef(false);
+  const hasRequestedProducts = useRef(false);
   const [currentDate, setCurrentDate] = useState(() => new Date());
 
   useEffect(() => {
@@ -61,6 +71,24 @@ const TopMenu = () => {
       document.removeEventListener("mousedown", handleDocumentMouseDown);
     };
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      hasRequestedOrders.current = false;
+      hasRequestedProducts.current = false;
+      return;
+    }
+
+    if (orders.length === 0 && !hasRequestedOrders.current) {
+      hasRequestedOrders.current = true;
+      dispatch(fetchOrders());
+    }
+
+    if (products.length === 0 && !hasRequestedProducts.current) {
+      hasRequestedProducts.current = true;
+      dispatch(fetchProducts({ type: undefined, specification: undefined }));
+    }
+  }, [dispatch, isAuthenticated, orders.length, products.length]);
 
   const handleLogout = () => {
     dispatch(logout());
