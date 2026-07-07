@@ -104,6 +104,8 @@ export const attachProductToGroup = async (req, res) => {
       message: "Product was added to group",
     });
   } catch (error) {
+    console.error("Failed to add product to group:", error);
+
     return res.status(500).json({
       message: "Failed to add product to group",
     });
@@ -154,6 +156,8 @@ export const removeProductFromGroup = async (req, res) => {
       message: "Product was removed from group",
     });
   } catch (error) {
+    console.error("Failed to remove product from group:", error);
+
     return res.status(500).json({
       message: "Failed to remove product from group",
     });

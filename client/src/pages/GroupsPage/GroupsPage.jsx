@@ -13,7 +13,9 @@ import {
   selectDeleteModalOrder,
   selectDeleteModalOrderId,
   selectGroupProductIds,
+  selectEditingOrder,
   selectIsProductLinking,
+  selectOrderFormMode,
   selectOrderFormOpen,
   selectOrders,
   selectOrdersError,
@@ -35,6 +37,7 @@ import {
   removeOrder,
   removeProductFromGroup,
   setSelectedOrderId,
+  updateOrder,
 } from "../../features/orders/ordersSlice";
 import {
   getOrderId,
@@ -57,6 +60,8 @@ export const GroupsPage = () => {
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
   const isOrderFormOpen = useSelector(selectOrderFormOpen);
+  const orderFormMode = useSelector(selectOrderFormMode);
+  const editingOrder = useSelector(selectEditingOrder);
   const selectedGroupProductIds = useSelector(selectGroupProductIds);
   const mutationLoading = useSelector(selectOrdersMutationLoading);
   const isProductLinking = useSelector(selectIsProductLinking);
@@ -96,11 +101,31 @@ export const GroupsPage = () => {
   const handleOrderSubmit = (payload) => {
     const groupOrderPayload = {
       title: payload.name,
-      date: new Date().toISOString(),
       description: payload.description,
     };
 
-    dispatch(createOrder(groupOrderPayload));
+    if (orderFormMode === "edit") {
+      const editingOrderId = getOrderId(editingOrder);
+
+      if (editingOrderId === null || editingOrderId === undefined) {
+        return;
+      }
+
+      dispatch(
+        updateOrder({
+          orderId: editingOrderId,
+          orderPayload: groupOrderPayload,
+        }),
+      );
+      return;
+    }
+
+    dispatch(
+      createOrder({
+        ...groupOrderPayload,
+        date: new Date().toISOString(),
+      }),
+    );
   };
 
   const handleOpenDeleteModal = (orderId) => {
@@ -227,8 +252,11 @@ export const GroupsPage = () => {
       )}
 
       <OrderFormModal
+        key={`${orderFormMode}-${getOrderId(editingOrder) ?? "new"}`}
         isOpen={isOrderFormOpen}
         isLoading={mutationLoading}
+        mode={orderFormMode}
+        order={editingOrder}
         onClose={handleCloseOrderFormModal}
         onSubmit={handleOrderSubmit}
       />

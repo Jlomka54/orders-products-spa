@@ -1,14 +1,21 @@
 import { useState } from "react";
 
-const createEmptyGroupForm = () => ({
-  name: "",
-  description: "",
+const createGroupForm = (order = null) => ({
+  name: order?.title ?? "",
+  description: order?.description ?? "",
 });
 
-const OrderFormModalContent = ({ isLoading, onClose, onSubmit }) => {
-  const [form, setForm] = useState(() => createEmptyGroupForm());
-  const title = "Создать группу";
-  const submitText = "Создать группу";
+const OrderFormModalContent = ({
+  isLoading,
+  mode,
+  order,
+  onClose,
+  onSubmit,
+}) => {
+  const [form, setForm] = useState(() => createGroupForm(order));
+  const isEditMode = mode === "edit";
+  const title = isEditMode ? "Изменить группу" : "Создать группу";
+  const submitText = isEditMode ? "Сохранить" : "Создать группу";
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -97,7 +104,14 @@ const OrderFormModalContent = ({ isLoading, onClose, onSubmit }) => {
   );
 };
 
-const OrderFormModal = ({ isOpen, isLoading, onClose, onSubmit }) => {
+const OrderFormModal = ({
+  isOpen,
+  isLoading,
+  mode = "create",
+  order = null,
+  onClose,
+  onSubmit,
+}) => {
   if (!isOpen) {
     return null;
   }
@@ -105,6 +119,8 @@ const OrderFormModal = ({ isOpen, isLoading, onClose, onSubmit }) => {
   return (
     <OrderFormModalContent
       isLoading={isLoading}
+      mode={mode}
+      order={order}
       onClose={onClose}
       onSubmit={onSubmit}
     />

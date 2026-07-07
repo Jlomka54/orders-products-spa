@@ -344,10 +344,19 @@ const ordersSlice = createSlice({
       .addCase(updateOrder.fulfilled, (state, action) => {
         const updatedOrderId = action.payload.orderId;
         const updatedOrder = normalizeOrder(action.payload.order);
+        const updatedOrderResponseId = getOrderId(updatedOrder);
+        const mergeUpdatedOrder = (currentOrder) => ({
+          ...currentOrder,
+          ...updatedOrder,
+          products: Array.isArray(updatedOrder.products)
+            ? updatedOrder.products
+            : getOrderProducts(currentOrder),
+        });
 
         state.items = state.items.map((order) =>
-          isSameOrder(getOrderId(order), updatedOrderId)
-            ? updatedOrder
+          isSameOrder(getOrderId(order), updatedOrderId) ||
+          isSameOrder(getOrderId(order), updatedOrderResponseId)
+            ? mergeUpdatedOrder(order)
             : order,
         );
 
@@ -355,9 +364,15 @@ const ordersSlice = createSlice({
           isSameOrder(
             getOrderId(state.selectedOrderDetails),
             updatedOrderId,
+          ) ||
+          isSameOrder(
+            getOrderId(state.selectedOrderDetails),
+            updatedOrderResponseId,
           )
         ) {
-          state.selectedOrderDetails = updatedOrder;
+          state.selectedOrderDetails = mergeUpdatedOrder(
+            state.selectedOrderDetails,
+          );
         }
 
         state.isOrderFormOpen = false;
