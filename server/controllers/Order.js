@@ -63,7 +63,8 @@ export const getOrderById = async (req, res) => {
     const embeddedProducts = Array.isArray(orderObject.products)
       ? orderObject.products
       : [];
-    const productOrderId = orderObject.legacyId ?? orderObject.id;
+    const productOrderId =
+      orderObject.legacyId ?? String(orderObject._id ?? orderObject.id);
     const linkedProducts =
       productOrderId === undefined
         ? []

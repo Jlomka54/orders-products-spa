@@ -1,5 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  addProductToGroupApi,
+  removeProductFromGroupApi,
+} from "../../api/groupsApi";
+import {
   createOrderApi,
   deleteOrderApi,
   getOrderByIdApi,
@@ -13,9 +17,14 @@ import {
 } from "../../api/productsApi";
 import {
   getOrderId,
+  getOrderProducts,
   isSameOrder,
   normalizeOrder,
 } from "../../utils/orderHelpers";
+import {
+  getProductId,
+  isSameProduct,
+} from "../../utils/productHelpers";
 
 export const fetchOrders = createAsyncThunk(
   "orders/fetchOrders",
@@ -84,6 +93,53 @@ export const removeOrder = createAsyncThunk(
   },
 );
 
+export const addExistingProductToGroup = createAsyncThunk(
+  "orders/addExistingProductToGroup",
+  async ({ groupId, productId }, { getState, rejectWithValue }) => {
+    try {
+      const { orders } = getState();
+      const selectedGroup = isSameOrder(
+        getOrderId(orders.selectedOrderDetails),
+        groupId,
+      )
+        ? orders.selectedOrderDetails
+        : orders.items.find((order) => isSameOrder(getOrderId(order), groupId));
+      const isAlreadyLinked = getOrderProducts(selectedGroup).some((product) =>
+        isSameProduct(getProductId(product), productId),
+      );
+
+      if (isAlreadyLinked) {
+        return rejectWithValue("Product is already in this group");
+      }
+
+      const response = await addProductToGroupApi(groupId, productId);
+
+      return {
+        groupId,
+        group: response.group || response,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const removeProductFromGroup = createAsyncThunk(
+  "orders/removeProductFromGroup",
+  async ({ groupId, productId }, { rejectWithValue }) => {
+    try {
+      const response = await removeProductFromGroupApi(groupId, productId);
+
+      return {
+        groupId,
+        group: response.group || response,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
 export const addProductToOrder = createAsyncThunk(
   "orders/addProductToOrder",
   async ({ orderId, product }, { rejectWithValue }) => {
@@ -142,6 +198,8 @@ const initialState = {
   editingOrder: null,
   isLoading: false,
   mutationLoading: false,
+  isProductLinking: false,
+  productLinkingError: null,
   error: null,
 };
 
@@ -163,6 +221,44 @@ const setMutationPendingState = (state) => {
 const setMutationRejectedState = (state, action) => {
   state.mutationLoading = false;
   state.error = action.payload || action.error.message || "Orders request failed";
+};
+
+const setProductLinkingPendingState = (state) => {
+  state.isProductLinking = true;
+  state.productLinkingError = null;
+};
+
+const setProductLinkingRejectedState = (state, action) => {
+  state.isProductLinking = false;
+  state.productLinkingError =
+    action.payload || action.error.message || "Group product request failed";
+};
+
+const applyUpdatedGroup = (state, action) => {
+  const updatedGroup = normalizeOrder(action.payload.group);
+  const updatedGroupId = getOrderId(updatedGroup);
+  const requestedGroupId = action.payload.groupId;
+
+  state.items = state.items.map((order) => {
+    const orderId = getOrderId(order);
+    const matchesUpdatedGroup =
+      isSameOrder(orderId, updatedGroupId) ||
+      isSameOrder(orderId, requestedGroupId);
+
+    return matchesUpdatedGroup ? updatedGroup : order;
+  });
+
+  if (
+    isSameOrder(state.selectedOrderId, requestedGroupId) ||
+    isSameOrder(state.selectedOrderId, updatedGroupId) ||
+    isSameOrder(getOrderId(state.selectedOrderDetails), requestedGroupId) ||
+    isSameOrder(getOrderId(state.selectedOrderDetails), updatedGroupId)
+  ) {
+    state.selectedOrderDetails = updatedGroup;
+  }
+
+  state.isProductLinking = false;
+  state.productLinkingError = null;
 };
 
 const ordersSlice = createSlice({
@@ -248,10 +344,19 @@ const ordersSlice = createSlice({
       .addCase(updateOrder.fulfilled, (state, action) => {
         const updatedOrderId = action.payload.orderId;
         const updatedOrder = normalizeOrder(action.payload.order);
+        const updatedOrderResponseId = getOrderId(updatedOrder);
+        const mergeUpdatedOrder = (currentOrder) => ({
+          ...currentOrder,
+          ...updatedOrder,
+          products: Array.isArray(updatedOrder.products)
+            ? updatedOrder.products
+            : getOrderProducts(currentOrder),
+        });
 
         state.items = state.items.map((order) =>
-          isSameOrder(getOrderId(order), updatedOrderId)
-            ? updatedOrder
+          isSameOrder(getOrderId(order), updatedOrderId) ||
+          isSameOrder(getOrderId(order), updatedOrderResponseId)
+            ? mergeUpdatedOrder(order)
             : order,
         );
 
@@ -259,9 +364,15 @@ const ordersSlice = createSlice({
           isSameOrder(
             getOrderId(state.selectedOrderDetails),
             updatedOrderId,
+          ) ||
+          isSameOrder(
+            getOrderId(state.selectedOrderDetails),
+            updatedOrderResponseId,
           )
         ) {
-          state.selectedOrderDetails = updatedOrder;
+          state.selectedOrderDetails = mergeUpdatedOrder(
+            state.selectedOrderDetails,
+          );
         }
 
         state.isOrderFormOpen = false;
@@ -269,7 +380,16 @@ const ordersSlice = createSlice({
         state.mutationLoading = false;
         state.error = null;
       })
-      .addCase(updateOrder.rejected, setMutationRejectedState);
+      .addCase(updateOrder.rejected, setMutationRejectedState)
+      .addCase(addExistingProductToGroup.pending, setProductLinkingPendingState)
+      .addCase(addExistingProductToGroup.fulfilled, applyUpdatedGroup)
+      .addCase(
+        addExistingProductToGroup.rejected,
+        setProductLinkingRejectedState,
+      )
+      .addCase(removeProductFromGroup.pending, setProductLinkingPendingState)
+      .addCase(removeProductFromGroup.fulfilled, applyUpdatedGroup)
+      .addCase(removeProductFromGroup.rejected, setProductLinkingRejectedState);
   },
 });
 

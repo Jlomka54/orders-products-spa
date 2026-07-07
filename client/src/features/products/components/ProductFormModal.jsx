@@ -22,6 +22,7 @@ const ProductFormModalContent = ({
   onSubmit,
   productTypes = [],
   productSpecifications = [],
+  productGroups = [],
 }) => {
   const [form, setForm] = useState(() => getInitialForm(mode, product));
 
@@ -238,15 +239,21 @@ const ProductFormModalContent = ({
 
           <label className="product-form-modal__field">
             <span className="product-form-modal__label">Приход</span>
-            <input
+            <select
               className="product-form-modal__input"
-              type="number"
               name="order"
               value={form.order}
               onChange={handleChange}
               disabled={isLoading}
               required
-            />
+            >
+              <option value="">Выберите группу</option>
+              {productGroups.map((group) => (
+                <option value={group.value} key={group.value}>
+                  {group.label}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label className="product-form-modal__field">
@@ -292,6 +299,9 @@ const ProductFormModal = ({
   isLoading,
   onClose,
   onSubmit,
+  productTypes = [],
+  productSpecifications = [],
+  productGroups = [],
 }) => {
   if (!isOpen) {
     return null;
@@ -307,6 +317,9 @@ const ProductFormModal = ({
       isLoading={isLoading}
       onClose={onClose}
       onSubmit={onSubmit}
+      productTypes={productTypes}
+      productSpecifications={productSpecifications}
+      productGroups={productGroups}
     />
   );
 };

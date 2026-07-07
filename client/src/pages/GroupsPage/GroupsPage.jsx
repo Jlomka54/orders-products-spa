@@ -1,16 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../../components/ui/EmptyState";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
+import AddExistingProductModal from "../../features/groups/components/AddExistingProductModal";
+import RemoveProductFromGroupModal from "../../features/groups/components/RemoveProductFromGroupModal";
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
 import OrderDetailsPanel from "../../features/orders/components/OrderDetailsPanel";
 import OrderFormModal from "../../features/orders/components/OrderFormModal";
-import ProductFormModal from "../../features/products/components/ProductFormModal";
 import OrdersList from "../../features/orders/components/OrdersList";
 import {
   selectDeleteModalOrder,
   selectDeleteModalOrderId,
+  selectGroupProductIds,
+  selectEditingOrder,
+  selectIsProductLinking,
+  selectOrderFormMode,
   selectOrderFormOpen,
   selectOrders,
   selectOrdersError,
@@ -30,26 +35,23 @@ import {
   openEditOrderModal,
   openDeleteModal,
   removeOrder,
+  removeProductFromGroup,
   setSelectedOrderId,
+  updateOrder,
 } from "../../features/orders/ordersSlice";
-import {
-  selectProductFormOpen,
-  selectProductsMutationLoading,
-} from "../../features/products/productsSelectors";
-import {
-  closeProductFormModal,
-  createProduct,
-  openCreateProductModal,
-  removeProduct,
-} from "../../features/products/productsSlice";
 import {
   getOrderId,
   isSameOrder,
 } from "../../utils/orderHelpers";
+import { getProductId } from "../../utils/productHelpers";
 import "./GroupsPage.css";
 
 export const GroupsPage = () => {
   const dispatch = useDispatch();
+  const [isAddExistingProductModalOpen, setIsAddExistingProductModalOpen] =
+    useState(false);
+  const [productPendingRemoval, setProductPendingRemoval] = useState(null);
+  const [removeProductError, setRemoveProductError] = useState("");
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
@@ -58,9 +60,11 @@ export const GroupsPage = () => {
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
   const isOrderFormOpen = useSelector(selectOrderFormOpen);
-  const isProductFormOpen = useSelector(selectProductFormOpen);
+  const orderFormMode = useSelector(selectOrderFormMode);
+  const editingOrder = useSelector(selectEditingOrder);
+  const selectedGroupProductIds = useSelector(selectGroupProductIds);
   const mutationLoading = useSelector(selectOrdersMutationLoading);
-  const productMutationLoading = useSelector(selectProductsMutationLoading);
+  const isProductLinking = useSelector(selectIsProductLinking);
 
   const selectedDetailsId = getOrderId(selectedOrderDetails);
   const activeSelectedOrderDetails = isSameOrder(
@@ -97,19 +101,39 @@ export const GroupsPage = () => {
   const handleOrderSubmit = (payload) => {
     const groupOrderPayload = {
       title: payload.name,
-      date: new Date().toISOString(),
       description: payload.description,
     };
 
-    dispatch(createOrder(groupOrderPayload));
+    if (orderFormMode === "edit") {
+      const editingOrderId = getOrderId(editingOrder);
+
+      if (editingOrderId === null || editingOrderId === undefined) {
+        return;
+      }
+
+      dispatch(
+        updateOrder({
+          orderId: editingOrderId,
+          orderPayload: groupOrderPayload,
+        }),
+      );
+      return;
+    }
+
+    dispatch(
+      createOrder({
+        ...groupOrderPayload,
+        date: new Date().toISOString(),
+      }),
+    );
   };
 
   const handleOpenDeleteModal = (orderId) => {
     dispatch(openDeleteModal(orderId));
   };
 
-  const handleOpenCreateProductModal = () => {
-    dispatch(openCreateProductModal());
+  const handleOpenAddExistingProductModal = () => {
+    setIsAddExistingProductModalOpen(true);
   };
 
   const handleOpenEditOrderModal = (order) => {
@@ -120,31 +144,50 @@ export const GroupsPage = () => {
     dispatch(closeDeleteModal());
   };
 
-  const handleCloseProductFormModal = () => {
-    dispatch(closeProductFormModal());
+  const handleCloseAddExistingProductModal = () => {
+    setIsAddExistingProductModalOpen(false);
   };
 
-  const handleDeleteProduct = async (productId) => {
-    if (productId !== null && productId !== undefined) {
-      const result = await dispatch(removeProduct(productId));
+  const handleOpenRemoveProductModal = (product) => {
+    setProductPendingRemoval(product);
+    setRemoveProductError("");
+  };
 
-      if (result?.meta?.requestStatus === "fulfilled" && selectedOrderId) {
-        dispatch(fetchOrderById(selectedOrderId));
-      }
+  const handleCloseRemoveProductModal = () => {
+    if (!isProductLinking) {
+      setProductPendingRemoval(null);
+      setRemoveProductError("");
     }
   };
 
-  const handleProductSubmit = (payload) => {
-    // Products link to an order through the order's numeric `legacyId`,
-    // NOT its Mongo `_id`. `selectedOrderId` is usually the Mongo `_id`
-    // (a hex string), so `Number(selectedOrderId)` used to produce NaN
-    // and silently orphaned the product from its order.
-    const orderLegacyId = selectedOrderDetails?.legacyId;
-    const productPayload = orderLegacyId
-      ? { ...payload, order: Number(orderLegacyId) }
-      : payload;
+  const handleConfirmRemoveProductFromGroup = async () => {
+    const productId = getProductId(productPendingRemoval);
 
-    dispatch(createProduct(productPayload));
+    if (
+      selectedOrderId === null ||
+      selectedOrderId === undefined ||
+      productId === null ||
+      productId === undefined
+    ) {
+      setRemoveProductError("Не удалось определить группу или продукт.");
+      return;
+    }
+
+    try {
+      await dispatch(
+        removeProductFromGroup({
+          groupId: selectedOrderId,
+          productId,
+        }),
+      ).unwrap();
+      setProductPendingRemoval(null);
+      setRemoveProductError("");
+    } catch (error) {
+      setRemoveProductError(
+        error ||
+          "Не удалось убрать продукт из группы. Попробуйте еще раз.",
+      );
+    }
   };
 
   const handleConfirmDelete = () => {
@@ -199,8 +242,8 @@ export const GroupsPage = () => {
 
           <OrderDetailsPanel
             selectedOrderDetails={activeSelectedOrderDetails}
-            onAddProduct={handleOpenCreateProductModal}
-            onDeleteProduct={handleDeleteProduct}
+            onAddProduct={handleOpenAddExistingProductModal}
+            onDeleteProduct={handleOpenRemoveProductModal}
             onClose={handleCloseDetailsPanel}
           />
         </div>
@@ -209,26 +252,31 @@ export const GroupsPage = () => {
       )}
 
       <OrderFormModal
+        key={`${orderFormMode}-${getOrderId(editingOrder) ?? "new"}`}
         isOpen={isOrderFormOpen}
         isLoading={mutationLoading}
+        mode={orderFormMode}
+        order={editingOrder}
         onClose={handleCloseOrderFormModal}
         onSubmit={handleOrderSubmit}
       />
 
-      <ProductFormModal
-        isOpen={isProductFormOpen}
-        mode="create"
-        product={
-          selectedOrderDetails?.legacyId
-            ? {
-                order: Number(selectedOrderDetails.legacyId),
-                date: new Date().toISOString(),
-              }
-            : undefined
-        }
-        isLoading={productMutationLoading}
-        onClose={handleCloseProductFormModal}
-        onSubmit={handleProductSubmit}
+      {isAddExistingProductModalOpen && (
+        <AddExistingProductModal
+          isOpen={isAddExistingProductModalOpen}
+          selectedGroupId={selectedOrderId}
+          selectedGroupProductIds={selectedGroupProductIds}
+          onClose={handleCloseAddExistingProductModal}
+        />
+      )}
+
+      <RemoveProductFromGroupModal
+        isOpen={productPendingRemoval !== null}
+        product={productPendingRemoval}
+        isLoading={isProductLinking}
+        error={removeProductError}
+        onClose={handleCloseRemoveProductModal}
+        onConfirm={handleConfirmRemoveProductFromGroup}
       />
 
       <DeleteOrderModal
