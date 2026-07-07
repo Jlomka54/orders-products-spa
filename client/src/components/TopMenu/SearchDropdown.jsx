@@ -5,8 +5,13 @@ import {
   selectGlobalSearchResults,
   selectHasSearchResults,
 } from "../../features/search/searchSelectors";
+import {
+  fetchOrderById,
+  setSelectedOrderId,
+} from "../../features/orders/ordersSlice";
 import { clearSearchQuery, closeSearch } from "../../features/ui/uiSlice";
 import { selectIsSearchOpen } from "../../features/ui/uiSelectors";
+import { getOrderId } from "../../utils/orderHelpers";
 
 const MIN_SEARCH_LENGTH = 2;
 
@@ -42,10 +47,27 @@ const SearchDropdown = () => {
     return null;
   }
 
-  const handleResultClick = (path) => {
+  const closeAndClearSearch = () => {
     dispatch(closeSearch());
     dispatch(clearSearchQuery());
-    navigate(path);
+  };
+
+  const handleGroupResultClick = (group) => {
+    const groupId = getOrderId(group);
+
+    navigate("/groups");
+
+    if (groupId !== null && groupId !== undefined) {
+      dispatch(setSelectedOrderId(groupId));
+      dispatch(fetchOrderById(groupId));
+    }
+
+    closeAndClearSearch();
+  };
+
+  const handleProductResultClick = () => {
+    navigate("/products");
+    closeAndClearSearch();
   };
 
   return (
@@ -62,7 +84,7 @@ const SearchDropdown = () => {
                   className="top-menu__search-result"
                   type="button"
                   key={group?._id ?? group?.id ?? group?.legacyId ?? group?.title}
-                  onClick={() => handleResultClick("/groups")}
+                  onClick={() => handleGroupResultClick(group)}
                 >
                   <span>{group?.title}</span>
                   <span className="top-menu__search-result-label">Группа</span>
@@ -87,7 +109,7 @@ const SearchDropdown = () => {
                   product?.serialNumber ??
                   product?.title
                 }
-                onClick={() => handleResultClick("/products")}
+                onClick={handleProductResultClick}
               >
                 <span>{product?.title}</span>
                 <span className="top-menu__search-result-label">Продукт</span>
