@@ -8,6 +8,7 @@ import {
   setSearchQuery,
 } from "../../features/ui/uiSlice";
 import { selectSearchQuery } from "../../features/ui/uiSelectors";
+import SearchDropdown from "./SearchDropdown";
 import "./TopMenu.css";
 
 const formatWeekday = (date) =>
@@ -96,6 +97,7 @@ const TopMenu = () => {
             ×
           </button>
         )}
+        <SearchDropdown />
       </div>
 
       <ul className="top-menu__meta">
