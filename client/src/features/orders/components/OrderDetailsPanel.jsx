@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { getOrderProducts } from "../../../utils/orderHelpers";
-import { getProductId } from "../../../utils/productHelpers";
 
 const DetailProductPhoto = ({ product }) => {
   const [hasImageError, setHasImageError] = useState(false);
@@ -89,7 +88,7 @@ const OrderDetailsPanel = ({
                 className="orders-page__details-product-delete"
                 type="button"
                 aria-label="Удалить продукт"
-                onClick={() => onDeleteProduct(getProductId(product))}
+                onClick={() => onDeleteProduct(product)}
               >
                 <svg
                   width="16"
