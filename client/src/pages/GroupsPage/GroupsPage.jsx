@@ -1,16 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyState from "../../components/ui/EmptyState";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
+import AddExistingProductModal from "../../features/groups/components/AddExistingProductModal";
 import DeleteOrderModal from "../../features/orders/components/DeleteOrderModal";
 import OrderDetailsPanel from "../../features/orders/components/OrderDetailsPanel";
 import OrderFormModal from "../../features/orders/components/OrderFormModal";
-import ProductFormModal from "../../features/products/components/ProductFormModal";
 import OrdersList from "../../features/orders/components/OrdersList";
 import {
   selectDeleteModalOrder,
   selectDeleteModalOrderId,
+  selectGroupProductIds,
   selectOrderFormOpen,
   selectOrders,
   selectOrdersError,
@@ -32,16 +33,7 @@ import {
   removeOrder,
   setSelectedOrderId,
 } from "../../features/orders/ordersSlice";
-import {
-  selectProductFormOpen,
-  selectProductsMutationLoading,
-} from "../../features/products/productsSelectors";
-import {
-  closeProductFormModal,
-  createProduct,
-  openCreateProductModal,
-  removeProduct,
-} from "../../features/products/productsSlice";
+import { removeProduct } from "../../features/products/productsSlice";
 import {
   getOrderId,
   isSameOrder,
@@ -50,6 +42,8 @@ import "./GroupsPage.css";
 
 export const GroupsPage = () => {
   const dispatch = useDispatch();
+  const [isAddExistingProductModalOpen, setIsAddExistingProductModalOpen] =
+    useState(false);
   const orders = useSelector(selectOrders);
   const isLoading = useSelector(selectOrdersLoading);
   const error = useSelector(selectOrdersError);
@@ -58,9 +52,8 @@ export const GroupsPage = () => {
   const deleteModalOrderId = useSelector(selectDeleteModalOrderId);
   const deleteModalOrder = useSelector(selectDeleteModalOrder);
   const isOrderFormOpen = useSelector(selectOrderFormOpen);
-  const isProductFormOpen = useSelector(selectProductFormOpen);
+  const selectedGroupProductIds = useSelector(selectGroupProductIds);
   const mutationLoading = useSelector(selectOrdersMutationLoading);
-  const productMutationLoading = useSelector(selectProductsMutationLoading);
 
   const selectedDetailsId = getOrderId(selectedOrderDetails);
   const activeSelectedOrderDetails = isSameOrder(
@@ -108,8 +101,8 @@ export const GroupsPage = () => {
     dispatch(openDeleteModal(orderId));
   };
 
-  const handleOpenCreateProductModal = () => {
-    dispatch(openCreateProductModal());
+  const handleOpenAddExistingProductModal = () => {
+    setIsAddExistingProductModalOpen(true);
   };
 
   const handleOpenEditOrderModal = (order) => {
@@ -120,8 +113,8 @@ export const GroupsPage = () => {
     dispatch(closeDeleteModal());
   };
 
-  const handleCloseProductFormModal = () => {
-    dispatch(closeProductFormModal());
+  const handleCloseAddExistingProductModal = () => {
+    setIsAddExistingProductModalOpen(false);
   };
 
   const handleDeleteProduct = async (productId) => {
@@ -132,19 +125,6 @@ export const GroupsPage = () => {
         dispatch(fetchOrderById(selectedOrderId));
       }
     }
-  };
-
-  const handleProductSubmit = (payload) => {
-    // Products link to an order through the order's numeric `legacyId`,
-    // NOT its Mongo `_id`. `selectedOrderId` is usually the Mongo `_id`
-    // (a hex string), so `Number(selectedOrderId)` used to produce NaN
-    // and silently orphaned the product from its order.
-    const orderLegacyId = selectedOrderDetails?.legacyId;
-    const productPayload = orderLegacyId
-      ? { ...payload, order: Number(orderLegacyId) }
-      : payload;
-
-    dispatch(createProduct(productPayload));
   };
 
   const handleConfirmDelete = () => {
@@ -199,7 +179,7 @@ export const GroupsPage = () => {
 
           <OrderDetailsPanel
             selectedOrderDetails={activeSelectedOrderDetails}
-            onAddProduct={handleOpenCreateProductModal}
+            onAddProduct={handleOpenAddExistingProductModal}
             onDeleteProduct={handleDeleteProduct}
             onClose={handleCloseDetailsPanel}
           />
@@ -215,21 +195,14 @@ export const GroupsPage = () => {
         onSubmit={handleOrderSubmit}
       />
 
-      <ProductFormModal
-        isOpen={isProductFormOpen}
-        mode="create"
-        product={
-          selectedOrderDetails?.legacyId
-            ? {
-                order: Number(selectedOrderDetails.legacyId),
-                date: new Date().toISOString(),
-              }
-            : undefined
-        }
-        isLoading={productMutationLoading}
-        onClose={handleCloseProductFormModal}
-        onSubmit={handleProductSubmit}
-      />
+      {isAddExistingProductModalOpen && (
+        <AddExistingProductModal
+          isOpen={isAddExistingProductModalOpen}
+          selectedGroupId={selectedOrderId}
+          selectedGroupProductIds={selectedGroupProductIds}
+          onClose={handleCloseAddExistingProductModal}
+        />
+      )}
 
       <DeleteOrderModal
         deleteModalOrderId={deleteModalOrderId}
