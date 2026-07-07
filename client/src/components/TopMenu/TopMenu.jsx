@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../features/auth/authSlice";
 import {
   clearSearchQuery,
+  closeSearch,
   openSearch,
   setSearchQuery,
 } from "../../features/ui/uiSlice";
@@ -32,6 +33,7 @@ const TopMenu = () => {
   const navigate = useNavigate();
   const activeSessions = useSelector((state) => state.ui.activeSessions);
   const searchQuery = useSelector(selectSearchQuery);
+  const searchRef = useRef(null);
   const [currentDate, setCurrentDate] = useState(() => new Date());
 
   useEffect(() => {
@@ -43,6 +45,22 @@ const TopMenu = () => {
       window.clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+    const handleDocumentMouseDown = (event) => {
+      if (searchRef.current?.contains(event.target)) {
+        return;
+      }
+
+      dispatch(closeSearch());
+    };
+
+    document.addEventListener("mousedown", handleDocumentMouseDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentMouseDown);
+    };
+  }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -77,7 +95,7 @@ const TopMenu = () => {
         <span className="top-menu__brand-text">ИНВЕНТАРЬ</span>
       </div>
 
-      <div className="top-menu__search">
+      <div className="top-menu__search" ref={searchRef}>
         <span className="top-menu__search-label">Поиск</span>
         <input
           className="top-menu__search-input"
