@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import {
   getProductId,
   isSameProduct,
@@ -11,14 +10,12 @@ const ProductsList = ({
   onEditProduct,
   onDeleteProduct,
 }) => {
-  const highlightedProductRef = useRef(null);
-
-  useEffect(() => {
-    highlightedProductRef.current?.scrollIntoView({
+  const scrollHighlightedProductIntoView = (node) => {
+    node?.scrollIntoView({
       block: "center",
       behavior: "smooth",
     });
-  }, [products, selectedProductId]);
+  };
 
   return (
     <ul className="products-page__list">
@@ -31,7 +28,7 @@ const ProductsList = ({
             className={`products-page__item${
               isHighlighted ? " products-page__item--highlighted" : ""
             }`}
-            ref={isHighlighted ? highlightedProductRef : null}
+            ref={isHighlighted ? scrollHighlightedProductIntoView : null}
             key={product.id ?? product._id ?? product.serialNumber ?? index}
           >
             <ProductItem
