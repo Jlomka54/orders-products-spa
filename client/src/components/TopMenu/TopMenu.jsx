@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../features/auth/authSlice";
+import {
+  clearSearchQuery,
+  openSearch,
+  setSearchQuery,
+} from "../../features/ui/uiSlice";
+import { selectSearchQuery } from "../../features/ui/uiSelectors";
 import "./TopMenu.css";
 
 const formatWeekday = (date) =>
@@ -24,6 +30,7 @@ const TopMenu = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const activeSessions = useSelector((state) => state.ui.activeSessions);
+  const searchQuery = useSelector(selectSearchQuery);
   const [currentDate, setCurrentDate] = useState(() => new Date());
 
   useEffect(() => {
@@ -41,6 +48,27 @@ const TopMenu = () => {
     navigate("/login", { replace: true });
   };
 
+  const handleSearchChange = (event) => {
+    dispatch(setSearchQuery(event.target.value));
+  };
+
+  const handleSearchFocus = () => {
+    if (searchQuery.trim() !== "") {
+      dispatch(openSearch());
+    }
+  };
+
+  const handleSearchKeyDown = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      dispatch(clearSearchQuery());
+    }
+  };
+
+  const handleClearSearch = () => {
+    dispatch(clearSearchQuery());
+  };
+
   return (
     <header className="top-menu">
       <div className="top-menu__brand">
@@ -48,10 +76,27 @@ const TopMenu = () => {
         <span className="top-menu__brand-text">ИНВЕНТАРЬ</span>
       </div>
 
-      <label className="top-menu__search">
+      <div className="top-menu__search">
         <span className="top-menu__search-label">Поиск</span>
-        <input className="top-menu__search-input" type="search" />
-      </label>
+        <input
+          className="top-menu__search-input"
+          type="search"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onFocus={handleSearchFocus}
+          onKeyDown={handleSearchKeyDown}
+        />
+        {searchQuery && (
+          <button
+            className="top-menu__search-clear"
+            type="button"
+            aria-label="Clear search"
+            onClick={handleClearSearch}
+          >
+            ×
+          </button>
+        )}
+      </div>
 
       <ul className="top-menu__meta">
         <li className="top-menu__weekday">{formatWeekday(currentDate)}</li>
