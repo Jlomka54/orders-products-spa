@@ -9,9 +9,14 @@ import {
   fetchOrderById,
   setSelectedOrderId,
 } from "../../features/orders/ordersSlice";
+import {
+  resetFilters,
+  setSelectedProductId,
+} from "../../features/products/productsSlice";
 import { clearSearchQuery, closeSearch } from "../../features/ui/uiSlice";
 import { selectIsSearchOpen } from "../../features/ui/uiSelectors";
 import { getOrderId } from "../../utils/orderHelpers";
+import { getProductRequestId } from "../../utils/productHelpers";
 
 const MIN_SEARCH_LENGTH = 2;
 
@@ -65,8 +70,16 @@ const SearchDropdown = () => {
     closeAndClearSearch();
   };
 
-  const handleProductResultClick = () => {
+  const handleProductResultClick = (product) => {
+    const productId = getProductRequestId(product);
+
     navigate("/products");
+
+    if (productId !== null && productId !== undefined) {
+      dispatch(resetFilters());
+      dispatch(setSelectedProductId(productId));
+    }
+
     closeAndClearSearch();
   };
 
@@ -109,7 +122,7 @@ const SearchDropdown = () => {
                   product?.serialNumber ??
                   product?.title
                 }
-                onClick={handleProductResultClick}
+                onClick={() => handleProductResultClick(product)}
               >
                 <span>{product?.title}</span>
                 <span className="top-menu__search-result-label">Продукт</span>
