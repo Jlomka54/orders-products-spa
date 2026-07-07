@@ -118,6 +118,9 @@ const productsSlice = createSlice({
       state.selectedType = "all";
       state.selectedSpecification = "all";
     },
+    setSelectedProductId: (state, action) => {
+      state.selectedProductId = action.payload;
+    },
     openCreateProductModal: (state) => {
       state.isProductFormOpen = true;
       state.productFormMode = "create";
@@ -202,6 +205,7 @@ export const {
   openCreateProductModal,
   openDeleteProductModal,
   openEditProductModal,
+  setSelectedProductId,
   setSelectedType,
   setSelectedSpecification,
   resetFilters,

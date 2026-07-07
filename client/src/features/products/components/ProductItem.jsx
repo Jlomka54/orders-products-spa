@@ -1,4 +1,3 @@
-import { useState } from "react";
 import StatusBadge from "../../../components/ui/StatusBadge";
 import { formatLongDate, formatShortDate } from "../../../utils/formatDate";
 import { formatPrice } from "../../../utils/formatPrice";
@@ -29,11 +28,14 @@ const getOrderTitle = (product) => {
 };
 
 const ProductItem = ({ product, onEdit, onDelete }) => {
-  const [hasImageError, setHasImageError] = useState(false);
   const usdPrice = findPrice(product.price, "USD");
   const uahPrice = findPrice(product.price, "UAH");
-  const shouldShowImage = product.photo && !hasImageError;
   const productId = getProductRequestId(product);
+
+  const handleImageError = (event) => {
+    event.currentTarget.hidden = true;
+    event.currentTarget.nextElementSibling?.removeAttribute("hidden");
+  };
 
   return (
     <article className="products-page__product">
@@ -45,18 +47,20 @@ const ProductItem = ({ product, onEdit, onDelete }) => {
       />
 
       <div className="products-page__photo">
-        {shouldShowImage ? (
+        {product.photo && (
           <img
             className="products-page__image"
             src={product.photo}
             alt={product.title}
-            onError={() => setHasImageError(true)}
+            onError={handleImageError}
           />
-        ) : (
-          <span className="products-page__image-placeholder">
-            Нет изображения
-          </span>
         )}
+        <span
+          className="products-page__image-placeholder"
+          hidden={Boolean(product.photo)}
+        >
+          Нет изображения
+        </span>
       </div>
 
       <div className="products-page__main-info">

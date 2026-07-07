@@ -81,6 +81,13 @@
   margin-top: 8px;
 }
 
+.products-page__item--highlighted .products-page__product {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 3px rgb(139 195 74 / 18%),
+    0 4px 14px rgb(53 73 84 / 12%);
+}
+
 .products-page__product {
   display: grid;
   grid-template-columns:

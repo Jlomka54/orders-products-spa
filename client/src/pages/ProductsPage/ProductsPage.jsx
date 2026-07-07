@@ -22,6 +22,7 @@ import {
   selectProductsMutationLoading,
   selectProductSpecifications,
   selectProductTypes,
+  selectSelectedProductId,
   selectSelectedSpecification,
   selectSelectedType,
 } from "../../features/products/productsSelectors";
@@ -61,6 +62,7 @@ export const ProductsPage = () => {
   const error = useSelector(selectProductsError);
   const selectedType = useSelector(selectSelectedType);
   const selectedSpecification = useSelector(selectSelectedSpecification);
+  const selectedProductId = useSelector(selectSelectedProductId);
   const productTypes = useSelector(selectProductTypes);
   const productSpecifications = useSelector(selectProductSpecifications);
   const isProductFormOpen = useSelector(selectProductFormOpen);
@@ -184,6 +186,7 @@ export const ProductsPage = () => {
       ) : (
         <ProductsList
           products={filteredProducts}
+          selectedProductId={selectedProductId}
           onEditProduct={handleOpenEditProductModal}
           onDeleteProduct={handleOpenDeleteProductModal}
         />

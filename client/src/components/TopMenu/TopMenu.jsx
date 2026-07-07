@@ -1,7 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { selectIsAuthenticated } from "../../features/auth/authSelectors";
 import { logout } from "../../features/auth/authSlice";
+import { selectOrders } from "../../features/orders/ordersSelectors";
+import { fetchOrders } from "../../features/orders/ordersSlice";
+import { selectProducts } from "../../features/products/productsSelectors";
+import { fetchProducts } from "../../features/products/productsSlice";
+import {
+  clearSearchQuery,
+  closeSearch,
+  openSearch,
+  setSearchQuery,
+} from "../../features/ui/uiSlice";
+import { selectSearchQuery } from "../../features/ui/uiSelectors";
+import SearchDropdown from "./SearchDropdown";
 import "./TopMenu.css";
 
 const formatWeekday = (date) =>
@@ -23,7 +36,14 @@ const formatTime = (date) =>
 const TopMenu = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const activeSessions = useSelector((state) => state.ui.activeSessions);
+  const searchQuery = useSelector(selectSearchQuery);
+  const orders = useSelector(selectOrders);
+  const products = useSelector(selectProducts);
+  const searchRef = useRef(null);
+  const hasRequestedOrders = useRef(false);
+  const hasRequestedProducts = useRef(false);
   const [currentDate, setCurrentDate] = useState(() => new Date());
 
   useEffect(() => {
@@ -36,9 +56,64 @@ const TopMenu = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleDocumentMouseDown = (event) => {
+      if (searchRef.current?.contains(event.target)) {
+        return;
+      }
+
+      dispatch(closeSearch());
+    };
+
+    document.addEventListener("mousedown", handleDocumentMouseDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentMouseDown);
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      hasRequestedOrders.current = false;
+      hasRequestedProducts.current = false;
+      return;
+    }
+
+    if (orders.length === 0 && !hasRequestedOrders.current) {
+      hasRequestedOrders.current = true;
+      dispatch(fetchOrders());
+    }
+
+    if (products.length === 0 && !hasRequestedProducts.current) {
+      hasRequestedProducts.current = true;
+      dispatch(fetchProducts({ type: undefined, specification: undefined }));
+    }
+  }, [dispatch, isAuthenticated, orders.length, products.length]);
+
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login", { replace: true });
+  };
+
+  const handleSearchChange = (event) => {
+    dispatch(setSearchQuery(event.target.value));
+  };
+
+  const handleSearchFocus = () => {
+    if (searchQuery.trim() !== "") {
+      dispatch(openSearch());
+    }
+  };
+
+  const handleSearchKeyDown = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      dispatch(clearSearchQuery());
+    }
+  };
+
+  const handleClearSearch = () => {
+    dispatch(clearSearchQuery());
   };
 
   return (
@@ -48,10 +123,28 @@ const TopMenu = () => {
         <span className="top-menu__brand-text">ИНВЕНТАРЬ</span>
       </div>
 
-      <label className="top-menu__search">
+      <div className="top-menu__search" ref={searchRef}>
         <span className="top-menu__search-label">Поиск</span>
-        <input className="top-menu__search-input" type="search" />
-      </label>
+        <input
+          className="top-menu__search-input"
+          type="search"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onFocus={handleSearchFocus}
+          onKeyDown={handleSearchKeyDown}
+        />
+        {searchQuery && (
+          <button
+            className="top-menu__search-clear"
+            type="button"
+            aria-label="Clear search"
+            onClick={handleClearSearch}
+          >
+            ×
+          </button>
+        )}
+        <SearchDropdown />
+      </div>
 
       <ul className="top-menu__meta">
         <li className="top-menu__weekday">{formatWeekday(currentDate)}</li>
