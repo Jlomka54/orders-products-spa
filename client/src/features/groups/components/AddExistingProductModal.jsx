@@ -203,7 +203,14 @@ const AddExistingProductModal = ({
                       key={getProductId(product) ?? product.serialNumber}
                       onClick={() => handleProductSelect(product)}
                     >
-                      <span className="add-existing-product-modal__radio" />
+                      <span
+                        className={`add-existing-product-modal__status-dot${
+                          product.isNew
+                            ? " add-existing-product-modal__status-dot--new"
+                            : ""
+                        }`}
+                        aria-hidden="true"
+                      />
                       <span className="add-existing-product-modal__product-main">
                         <span className="add-existing-product-modal__product-title">
                           {product.title}
