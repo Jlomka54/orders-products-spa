@@ -7,6 +7,8 @@ import DeleteProductModal from "../../features/products/components/DeleteProduct
 import ProductFormModal from "../../features/products/components/ProductFormModal";
 import ProductsFilters from "../../features/products/components/ProductsFilters";
 import ProductsList from "../../features/products/components/ProductsList";
+import { selectOrders as selectGroups } from "../../features/orders/ordersSelectors";
+import { fetchOrders as fetchGroups } from "../../features/orders/ordersSlice";
 import {
   selectDeleteModalProduct,
   selectDeleteModalProductId,
@@ -39,9 +41,21 @@ import {
 import { getProductRequestId } from "../../utils/productHelpers";
 import "./ProductsPage.css";
 
+const getGroupProductLinkId = (group) =>
+  group?.legacyId ?? group?._id ?? group?.id ?? null;
+
+const getGroupOptionLabel = (group, value) => {
+  if (group?.title) {
+    return group.title;
+  }
+
+  return `Группа ${value}`;
+};
+
 export const ProductsPage = () => {
   const dispatch = useDispatch();
   const products = useSelector(selectProducts);
+  const groups = useSelector(selectGroups);
   const filteredProducts = useSelector(selectFilteredProducts);
   const isLoading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
@@ -55,9 +69,24 @@ export const ProductsPage = () => {
   const deleteModalProductId = useSelector(selectDeleteModalProductId);
   const deleteModalProduct = useSelector(selectDeleteModalProduct);
   const mutationLoading = useSelector(selectProductsMutationLoading);
+  const productGroups = groups
+    .map((group) => {
+      const value = getGroupProductLinkId(group);
+
+      if (value === null || value === undefined) {
+        return null;
+      }
+
+      return {
+        value: String(value),
+        label: getGroupOptionLabel(group, value),
+      };
+    })
+    .filter(Boolean);
 
   useEffect(() => {
     dispatch(fetchProducts());
+    dispatch(fetchGroups());
   }, [dispatch]);
 
   const handleTypeChange = (event) => {
@@ -167,6 +196,7 @@ export const ProductsPage = () => {
         isLoading={mutationLoading}
         productTypes={productTypes}
         productSpecifications={productSpecifications}
+        productGroups={productGroups}
         onClose={handleCloseProductFormModal}
         onSubmit={handleProductSubmit}
       />

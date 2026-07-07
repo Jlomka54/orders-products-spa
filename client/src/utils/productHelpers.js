@@ -1,6 +1,32 @@
 const hasFormValue = (value) =>
   value !== null && value !== undefined && String(value).trim() !== "";
 
+const normalizeOrderValue = (value) => {
+  if (!hasFormValue(value)) {
+    return "";
+  }
+
+  return Number.isNaN(Number(value)) ? value : Number(value);
+};
+
+const formatDateInputValue = (value) => {
+  if (!hasFormValue(value)) {
+    return "";
+  }
+
+  if (typeof value === "string") {
+    const dateOnlyMatch = value.match(/^(\d{4}-\d{2}-\d{2})/);
+
+    if (dateOnlyMatch) {
+      return dateOnlyMatch[1];
+    }
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+};
+
 const findPriceValue = (prices, symbol) => {
   if (!Array.isArray(prices)) {
     return "";
@@ -66,12 +92,15 @@ export const createProductFormFromProduct = (product) => ({
   title: product?.title ?? "",
   type: product?.type ?? "",
   specification: product?.specification ?? "",
-  guaranteeStart: product?.guarantee?.start ?? "",
-  guaranteeEnd: product?.guarantee?.end ?? "",
+  guaranteeStart: formatDateInputValue(product?.guarantee?.start),
+  guaranteeEnd: formatDateInputValue(product?.guarantee?.end),
   priceUsd: findPriceValue(product?.price, "USD"),
   priceUah: findPriceValue(product?.price, "UAH"),
-  order: product?.order ?? "",
-  date: product?.date ?? "",
+  order:
+    product?.order === null || product?.order === undefined
+      ? ""
+      : String(product.order),
+  date: formatDateInputValue(product?.date),
 });
 
 export const buildProductPayload = (form) => {
@@ -89,7 +118,7 @@ export const buildProductPayload = (form) => {
       { value: Number(form.priceUsd), symbol: "USD", isDefault: false },
       { value: Number(form.priceUah), symbol: "UAH", isDefault: true },
     ],
-    order: Number(form.order),
+    order: normalizeOrderValue(form.order),
     date: form.date,
   };
 
