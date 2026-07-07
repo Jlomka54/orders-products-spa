@@ -7,6 +7,14 @@ const getDuplicateField = (error) => {
 
 const isNumeric = (value) => value !== "" && !Number.isNaN(Number(value));
 
+const normalizeOrderFilter = (order) => {
+  if (isNumeric(order)) {
+    return Number(order);
+  }
+
+  return order;
+};
+
 export const getProducts = async (req, res) => {
   try {
     const { type, order, isNew } = req.query;
@@ -17,7 +25,7 @@ export const getProducts = async (req, res) => {
     }
 
     if (order) {
-      filter.order = Number(order);
+      filter.order = normalizeOrderFilter(order);
     }
 
     if (isNew !== undefined) {

@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import authRouter from "./routes/auth.js";
+import groupsRouter from "./routes/groups.js";
 import ordersRouter from "./routes/orders.js";
 import productsRouter from "./routes/products.js";
 
@@ -35,6 +36,7 @@ app.use(async (req, res, next) => {
 
 // Routes
 app.use("/api/auth", authRouter);
+app.use("/api/groups", groupsRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/products", productsRouter);
 

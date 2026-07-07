@@ -86,8 +86,8 @@ const productSchema = new mongoose.Schema(
       },
     },
     order: {
-      type: Number,
-      required: true,
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
     },
     date: {
       type: Date,
